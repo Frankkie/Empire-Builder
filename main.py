@@ -690,10 +690,11 @@ class AreaScene():
         self.w = int(infoObject.current_w)
         self.h = int(infoObject.current_h)
         self.screen = screen
+        self.hugefont = pygame.font.SysFont("Times", 80)
         self.largefont = pygame.font.SysFont("Times", 40)
         self.medfont = pygame.font.SysFont("Times", 25)
         self.ButtonDict = {}
-        self.BackToMain = pygame.Rect((1600, 100, 180, 50))
+        self.BackToMain = pygame.Rect((1600, 20, 180, 50))
         
         self.bar = pygame.image.load("bar.png")
         self.bar = pygame.transform.scale(self.bar, (400, 10))
@@ -716,6 +717,9 @@ class AreaScene():
         self.barlist.append(self.uraniumbar)
         self.renewbar = Bar(self.screen, [50, 680], "Renewables", [60, 700], [0, 100], self.area[4][4][1])
         self.barlist.append(self.renewbar)
+
+        self.labellist = [Label(self.area[1], self.hugefont, [960 - int(len(self.area[1])*20), 20])]
+        
         self.Draw()
         
     def SwitchToScene(self, scene):
@@ -738,9 +742,9 @@ class AreaScene():
             clock_ = str(int(self.Clock/60))+":"+str(int(self.Clock%60))
             if self.Clock%60 < 10: clock_ = str(int(self.Clock/60))+":0"+str(int(self.Clock%60))            
             clock_label = self.largefont.render(clock_, 1, (255, 255, 255))
-            self.screen.blit(clock_label, (1680, 10))
+            self.screen.blit(clock_label, (1820, 20))
             
-            self.DrawButton((1600, 100, 180, 50), "Back to Map >>", [1610, 110])
+            self.DrawButton((1600, 20, 180, 50), "Back to Map >>", [1610, 30])
             self.foodbar.Draw_Bar(self.area[4][5][2], self.bar, self.point)
             self.taxesbar.Draw_Bar(self.area[10], self.bar, self.point)
             self.metalbar.Draw_Bar(self.area[4][0][2], self.bar, self.point)
@@ -748,6 +752,9 @@ class AreaScene():
             self.fossilbar.Draw_Bar(self.area[4][2][2], self.bar, self.point)
             self.uraniumbar.Draw_Bar(self.area[4][3][2], self.bar, self.point)
             self.renewbar.Draw_Bar(self.area[4][4][1], self.bar, self.point)
+            for label in self.labellist:
+                label.DrawLabel(self.screen)
+            
             mouse_pos = pygame.mouse.get_pos()
 
             i = self.area[8]
@@ -992,11 +999,11 @@ class Bar():
         return num
 
 class Label():
-    def __init__(self, text, font):
+    def __init__(self, text, font, pos):
+        self.pos = pos
         self.label = font.render(text, 1, (255, 255, 255))
-    def DrawLabel(self, screen, pos):
-        screen.blit(self.label, pos)
-
+    def DrawLabel(self, screen):
+        screen.blit(self.label, self.pos)
     
 class Area():
     def __init__(self, arealist):
