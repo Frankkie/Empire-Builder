@@ -992,11 +992,10 @@ class Bar():
         return num
 
 class Label():
-    def __init__(self, screen, pos, text, font):
-        pass
-
+    def __init__(self, text, font):
+        self.label = font.render(text, 1, (255, 255, 255))
     def DrawLabel(self, screen, pos):
-        pass
+        screen.blit(self.label, pos)
 
     
 class Area():
