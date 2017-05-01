@@ -1,10 +1,6 @@
 import pygame, sys, os, random, datetime, math
 from pygame import font
 
-#Fix error while loading images
-#Change appearance
-#Finish areadisplay class
-
 class MenuScene():
     def __init__(self, screen):
         self.screen = screen
@@ -487,12 +483,14 @@ class MainScene():
         self.h = int(infoObject.current_h)
         self.background = pygame.image.load("Colored Map, black sea.bmp")
         self.background = pygame.transform.scale(self.background, (int(self.w/1.05), int(self.h/1.05)))
-        
+
+        self.verylargefont = pygame.font.SysFont("Times", 50)
         self.largefont = pygame.font.SysFont("Times", 40)
         self.mediumfont = pygame.font.SysFont("Times", 25)
         
         self.areadotlist = []
         self.troopdotlist = []
+        
         x = 0
         for i in range(len(self.AreaList)):
             self.areadotlist.append(Area(self.AreaList[x]))
@@ -504,6 +502,12 @@ class MainScene():
             x += 1
 
         while 1:
+            dt = time.tick()
+            if not self.pause:
+                self.Clock -= dt/1000
+                if self.Clock < 0:
+                    return
+            
             screen.blit(self.background, [0,0])
             for area in self.areadotlist:
                 area.draw_area(screen)
@@ -515,17 +519,11 @@ class MainScene():
             yearlabel = self.mediumfont.render("Year: "+str(year), 1, (255, 255, 255))
             screen.blit(yearlabel, [10, 10])
 
-            dt = time.tick()
-
-            if not self.pause:
-                self.Clock -= dt/1000
-                if self.Clock < 0:
-                    return
             mouse_pos = pygame.mouse.get_pos()
             
             for i in range(len(self.AreaList)):
                 if self.areadotlist[i].button.collidepoint(mouse_pos):
-                    self.areadotlist[i].hover_display(screen)
+                    self.areadotlist[i].hover_display(screen, self.areadotlist[i].rect)
 
             for i in range(len(self.TroopList)):
                 if self.troopdotlist[i].button.collidepoint(mouse_pos):
@@ -690,16 +688,19 @@ class AreaScene():
         self.w = int(infoObject.current_w)
         self.h = int(infoObject.current_h)
         self.screen = screen
+        self.hugefont = pygame.font.SysFont("Times", 80)
+        self.verylargefont = pygame.font.SysFont("Times", 50)
         self.largefont = pygame.font.SysFont("Times", 40)
         self.medfont = pygame.font.SysFont("Times", 25)
         self.ButtonDict = {}
-        self.BackToMain = pygame.Rect((1600, 100, 180, 50))
+        self.BackToMain = pygame.Rect((1600, 20, 180, 50))
         
         self.bar = pygame.image.load("bar.png")
         self.bar = pygame.transform.scale(self.bar, (400, 10))
         self.point = pygame.image.load("point.png")
         self.point = pygame.transform.scale(self.point, (40, 40))
-
+        self.playerdot = pygame.image.load(self.area[5]+".png")
+        self.playerdot = pygame.transform.scale(self.playerdot, (50, 50))
         self.barlist = []
         
         self.taxesbar = Bar(self.screen, [50, 200], "Taxes", [60, 220], [0, 100], self.area[10])
@@ -716,6 +717,21 @@ class AreaScene():
         self.barlist.append(self.uraniumbar)
         self.renewbar = Bar(self.screen, [50, 680], "Renewables", [60, 700], [0, 100], self.area[4][4][1])
         self.barlist.append(self.renewbar)
+
+        if self.area[11][0] == 0: capital = "- Not Capital"
+        else: capital = "- Capital"
+
+        self.labellist = [Label(self.area[1], self.hugefont, [int(self.w/2 - len(self.area[1])*19), 20]), Label("- Moral: "+str(round(self.area[6]))+"%", self.largefont, [660, 175]),
+                          Label("- Population: "+str(round(self.area[3], 3))+" million people", self.largefont, [660, 225]), Label("- Per Capita Income:"+str(int(self.area[9]))+" coins", self.largefont, [660, 275]),
+                          Label("- Resources", self.verylargefont, [660, 340]),
+                          Label("- Food: "+str(int(self.area[4][5][0]))+"/"+str(self.area[4][5][1]), self.largefont, [660, 400]),
+                          Label("- Metal: "+str(self.area[4][0][0])+"/"+str(self.area[4][0][1]), self.largefont, [660, 450]),
+                          Label("- Timber: "+str(int(self.area[4][1][0]))+"/"+str(self.area[4][1][1]), self.largefont, [660, 500]),
+                          Label("- Fossil Fuels: "+str(self.area[4][2][0])+"/"+str(self.area[4][2][1]), self.largefont, [660, 550]),
+                          Label(" -Uranium: "+str(self.area[4][3][0])+"/"+str(self.area[4][3][1]), self.largefont, [660, 600]),
+                          Label(" -Renewables: "+"| "+(self.area[4][4][0] + 1)*"+"+(6 - self.area[4][4][0])*" "+"|", self.largefont, [660, 650]),
+                          Label(capital, self.largefont, [1360, 175])]
+        
         self.Draw()
         
     def SwitchToScene(self, scene):
@@ -730,17 +746,17 @@ class AreaScene():
     def Draw(self):
         while 1:
             self.screen.fill((50, 50, 50))
-            
+            self.screen.blit(self.playerdot, (int(self.w/2) + 19*len(self.area[1]) + 20, 50))
             dt = self.time.tick()
             self.Clock -= dt/1000
-            if self.Clock < 0.999:
+            if self.Clock < 0:
                 active_scene = MainScene(self.screen, self.NumPlayers, "AreaScene", self.Clock, self.year)
             clock_ = str(int(self.Clock/60))+":"+str(int(self.Clock%60))
             if self.Clock%60 < 10: clock_ = str(int(self.Clock/60))+":0"+str(int(self.Clock%60))            
             clock_label = self.largefont.render(clock_, 1, (255, 255, 255))
-            self.screen.blit(clock_label, (1680, 10))
+            self.screen.blit(clock_label, (1820, 20))
             
-            self.DrawButton((1600, 100, 180, 50), "Back to Map >>", [1610, 110])
+            self.DrawButton((1600, 20, 180, 50), "Back to Map >>", [1610, 30])
             self.foodbar.Draw_Bar(self.area[4][5][2], self.bar, self.point)
             self.taxesbar.Draw_Bar(self.area[10], self.bar, self.point)
             self.metalbar.Draw_Bar(self.area[4][0][2], self.bar, self.point)
@@ -748,6 +764,9 @@ class AreaScene():
             self.fossilbar.Draw_Bar(self.area[4][2][2], self.bar, self.point)
             self.uraniumbar.Draw_Bar(self.area[4][3][2], self.bar, self.point)
             self.renewbar.Draw_Bar(self.area[4][4][1], self.bar, self.point)
+            for label in self.labellist:
+                label.DrawLabel(self.screen)
+            
             mouse_pos = pygame.mouse.get_pos()
 
             i = self.area[8]
@@ -992,12 +1011,11 @@ class Bar():
         return num
 
 class Label():
-    def __init__(self, screen, pos, text, font):
-        pass
-
-    def DrawLabel(self, screen, pos):
-        pass
-
+    def __init__(self, text, font, pos):
+        self.pos = pos
+        self.label = font.render(text, 1, (255, 255, 255))
+    def DrawLabel(self, screen):
+        screen.blit(self.label, self.pos)
     
 class Area():
     def __init__(self, arealist):
@@ -1011,7 +1029,7 @@ class Area():
         self.neighbors = arealist[7]
         self.income_capita = arealist[9]
         self.tax = arealist[10]
-        
+        self.buildings = arealist[11]
         
         if type(self.neighbors) == list: self.sea = True
         if type(self.neighbors) == int: self.sea = False
@@ -1020,44 +1038,50 @@ class Area():
         self.area_point = pygame.image.load(self.country+".png")
         
         self.button = pygame.Rect(self.location[0], self.location[1], 20, 20)
-        self.myfont = pygame.font.SysFont("monospace", 30)
-        self.mysmallfont = pygame.font.SysFont("monospace", 18)
-        self.fi = 31/50
+        self.myfont = pygame.font.SysFont("times", 30)
+        self.mysmallfont = pygame.font.SysFont("times", 18)
+        
+
+        size = 225
+        if len(self.name) > 11:
+            size = int(17.5*len(self.name))
+
+        infoObject = pygame.display.Info()
+        w = int(infoObject.current_w/1)
+        h = int(infoObject.current_h/1)
+        self.ratio = 240/size
+        rect = [self.location[0] + 20, self.location[1] + 20, size, int(size*self.ratio)]
+        self.rect = rect
+
+        if rect[0] + rect[2] > w - 100: rect[0] = self.location[0] - 20 - size
+        if rect[1] + rect[3] > h - 100: rect[1] = self.location[1] - 20 - int(size*self.ratio)
+        
+        if self.buildings[0]: capital = "***"
+        else: capital = ""
+        if self.country == "c": player = "Computer"
+        if self.country[0] == "p": player = "Player "+self.country[1]
+        if self.country == "o": player = "Unclaimed waters"
+        
+        self.LabelList = [Label(self.name+capital, self.myfont, (rect[0] + 10, rect[1] + 5)), Label(player, self.mysmallfont, (rect[0] + 10, rect[1] + 44)),
+                          Label("Population: "+str(self.population/1000000)[:5]+" million", self.mysmallfont, (rect[0] + 10, rect[1] + 64)),
+                          Label("Moral: "+str(int(self.moral))+"%", self.mysmallfont, (rect[0] + 10, rect[1] + 84)),
+                          Label("Food: "+str(int(self.resources[5][0])), self.mysmallfont, (rect[0] + 10, rect[1] + 104)),
+                          Label("Metal: "+str(int(self.resources[0][0])), self.mysmallfont, (rect[0] + 10, rect[1] + 124)),
+                          Label("Timber: "+str(int(self.resources[1][0])), self.mysmallfont, (rect[0] + 10, rect[1] + 144)),
+                          Label("Fossil fuels: "+str(int(self.resources[2][0])), self.mysmallfont, (rect[0] + 10, rect[1] + 164)),
+                          Label("Uranium: "+str(int(self.resources[3][0])), self.mysmallfont, (rect[0] + 10, rect[1] + 184)),
+                          Label("Renewables: "+(self.resources[4][0]+1)*"#", self.mysmallfont, (rect[0] + 10, rect[1] + 204))]
 
     def draw_area(self, screen):
         screen.blit(self.area_point, self.location)
 
         
-    def hover_display(self, screen):
-        size = 300
-        if len(self.name) > 14:
-            size = int(20.5*len(self.name))
-
-        infoObject = pygame.display.Info()
-
-        w = int(infoObject.current_w/1)
-        h = int(infoObject.current_h/1)
-
-        rect = [self.location[0] + 20, self.location[1] + 20, size, size*self.fi]
-
-        if rect[0] + rect[2] > w - 100: rect[0] = self.location[0] - 20 - size
-        if rect[1] + rect[3] > h - 100: rect[1] = self.location[1] - 20 - size*self.fi
-        
+    def hover_display(self, screen, rect):
         screen.fill([50, 50, 50, 50], tuple(rect))
         pygame.draw.rect(screen, [0, 0, 0, 0], tuple(rect), 3)
-        
-        label = self.myfont.render(self.name, 1, (255,255,255))
-        if self.country == "c": player = "Computer"
-        if self.country[0] == "p": player = "Player "+self.country[1]
-        if self.country == "o": player = "Unclaimed waters"
-        label2 = self.mysmallfont.render(player, 1, (255, 255, 255))
-        label3 = self.mysmallfont.render("Population: "+str(self.population/1000000)[:5]+" million", 1, (255, 255, 255))
-        label4 = self.mysmallfont.render("Moral: "+str(int(self.moral))+"%", 1, (255, 255, 255))
-        screen.blit(label2, (rect[0] + 10, rect[1] + 44))
-        screen.blit(label, (rect[0] + 10, rect[1] + 10))
-        screen.blit(label3, (rect[0] + 10, rect[1] + 64))
-        screen.blit(label4, (rect[0] + 10, rect[1] + 84))
 
+        for label in self.LabelList:
+            label.DrawLabel(screen)
 
 class Building():
     pass
