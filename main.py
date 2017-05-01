@@ -1,10 +1,6 @@
 import pygame, sys, os, random, datetime, math
 from pygame import font
 
-#Fix error while loading images
-#Change appearance
-#Finish areadisplay class
-
 class MenuScene():
     def __init__(self, screen):
         self.screen = screen
