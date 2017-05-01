@@ -487,7 +487,8 @@ class MainScene():
         self.h = int(infoObject.current_h)
         self.background = pygame.image.load("Colored Map, black sea.bmp")
         self.background = pygame.transform.scale(self.background, (int(self.w/1.05), int(self.h/1.05)))
-        
+
+        self.verylargefont = pygame.font.SysFont("Times", 50)
         self.largefont = pygame.font.SysFont("Times", 40)
         self.mediumfont = pygame.font.SysFont("Times", 25)
         
@@ -504,6 +505,12 @@ class MainScene():
             x += 1
 
         while 1:
+            dt = time.tick()
+            if not self.pause:
+                self.Clock -= dt/1000
+                if self.Clock < 0:
+                    return
+            
             screen.blit(self.background, [0,0])
             for area in self.areadotlist:
                 area.draw_area(screen)
@@ -515,12 +522,6 @@ class MainScene():
             yearlabel = self.mediumfont.render("Year: "+str(year), 1, (255, 255, 255))
             screen.blit(yearlabel, [10, 10])
 
-            dt = time.tick()
-
-            if not self.pause:
-                self.Clock -= dt/1000
-                if self.Clock < 0:
-                    return
             mouse_pos = pygame.mouse.get_pos()
             
             for i in range(len(self.AreaList)):
@@ -691,6 +692,7 @@ class AreaScene():
         self.h = int(infoObject.current_h)
         self.screen = screen
         self.hugefont = pygame.font.SysFont("Times", 80)
+        self.verylargefont = pygame.font.SysFont("Times", 50)
         self.largefont = pygame.font.SysFont("Times", 40)
         self.medfont = pygame.font.SysFont("Times", 25)
         self.ButtonDict = {}
@@ -700,7 +702,8 @@ class AreaScene():
         self.bar = pygame.transform.scale(self.bar, (400, 10))
         self.point = pygame.image.load("point.png")
         self.point = pygame.transform.scale(self.point, (40, 40))
-
+        self.playerdot = pygame.image.load(self.area[5]+".png")
+        self.playerdot = pygame.transform.scale(self.playerdot, (50, 50))
         self.barlist = []
         
         self.taxesbar = Bar(self.screen, [50, 200], "Taxes", [60, 220], [0, 100], self.area[10])
@@ -718,7 +721,19 @@ class AreaScene():
         self.renewbar = Bar(self.screen, [50, 680], "Renewables", [60, 700], [0, 100], self.area[4][4][1])
         self.barlist.append(self.renewbar)
 
-        self.labellist = [Label(self.area[1], self.hugefont, [960 - int(len(self.area[1])*20), 20])]
+        if self.area[11][0] == 0: capital = "- Not Capital"
+        else: capital = "- Capital"
+
+        self.labellist = [Label(self.area[1], self.hugefont, [int(self.w/2 - len(self.area[1])*19), 20]), Label("- Moral: "+str(round(self.area[6]))+"%", self.largefont, [660, 175]),
+                          Label("- Population: "+str(round(self.area[3], 3))+" million people", self.largefont, [660, 225]), Label("- Per Capita Income:"+str(int(self.area[9]))+" coins", self.largefont, [660, 275]),
+                          Label("- Resources", self.verylargefont, [660, 340]),
+                          Label("- Food: "+str(int(self.area[4][5][0]))+"/"+str(self.area[4][5][1]), self.largefont, [660, 400]),
+                          Label("- Metal: "+str(self.area[4][0][0])+"/"+str(self.area[4][0][1]), self.largefont, [660, 450]),
+                          Label("- Timber: "+str(int(self.area[4][1][0]))+"/"+str(self.area[4][1][1]), self.largefont, [660, 500]),
+                          Label("- Fossil Fuels: "+str(self.area[4][2][0])+"/"+str(self.area[4][2][1]), self.largefont, [660, 550]),
+                          Label(" -Uranium: "+str(self.area[4][3][0])+"/"+str(self.area[4][3][1]), self.largefont, [660, 600]),
+                          Label(" -Renewables: "+"| "+(self.area[4][4][0] + 1)*"+"+(6 - self.area[4][4][0])*" "+"|", self.largefont, [660, 650]),
+                          Label(capital, self.largefont, [1360, 175])]
         
         self.Draw()
         
@@ -734,10 +749,10 @@ class AreaScene():
     def Draw(self):
         while 1:
             self.screen.fill((50, 50, 50))
-            
+            self.screen.blit(self.playerdot, (int(self.w/2) + 19*len(self.area[1]) + 20, 50))
             dt = self.time.tick()
             self.Clock -= dt/1000
-            if self.Clock < 0.999:
+            if self.Clock < 0:
                 active_scene = MainScene(self.screen, self.NumPlayers, "AreaScene", self.Clock, self.year)
             clock_ = str(int(self.Clock/60))+":"+str(int(self.Clock%60))
             if self.Clock%60 < 10: clock_ = str(int(self.Clock/60))+":0"+str(int(self.Clock%60))            
