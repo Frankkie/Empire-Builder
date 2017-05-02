@@ -22,7 +22,7 @@ class MenuScene():
         self.largefont = pygame.font.SysFont("times", 75)
         self.medfont = pygame.font.SysFont("times", 40)
         self.smallfont = pygame.font.SysFont("times", 20)
-        self.title = self.largefont.render("Empire Builder 0.1", 1, self.white)
+        self.title = self.largefont.render("Empire Builder 0.2", 1, self.white)
         self.labelselect = self.medfont.render("Select number of players:  ", 1, self.white)
         screen.blit(self.title, (self.w/2 - 285, 80))
         screen.blit(self.labelselect, (self.w/2 - 240, 300))
@@ -68,9 +68,6 @@ class MenuScene():
         label = self.medfont.render(text, 1, self.white)
         self.screen.fill(self.black, rect)
         self.screen.blit(label, textloc)
-
-    
-        
 
 class MainScene():
     def __init__(self, screen, NumPlayers, previous, clock, year):
@@ -968,11 +965,7 @@ class AreaScene():
                 self.PlayerList.append(lista)
         
         f.close()
-        return
-            
-
-
-    
+        return  
 
 #=============================================================================================
 #
@@ -1074,7 +1067,6 @@ class Area():
 
     def draw_area(self, screen):
         screen.blit(self.area_point, self.location)
-
         
     def hover_display(self, screen, rect):
         screen.fill([50, 50, 50, 50], tuple(rect))
@@ -1158,10 +1150,7 @@ class Troop():
         
         
 class Troop_Display():
-    pass
-        
-        
-        
+    pass       
 
 class Player():
     def __init__(self, playerlist, pause):
@@ -1204,8 +1193,7 @@ class Player():
         screen.blit(label8, (rect[0] + 10, rect[1] + 180))
         screen.blit(label9, (rect[0] + 10, rect[1] + 200))
         screen.blit(label10, (rect[0] + 10, rect[1] + 220))
-
-        
+       
         pygame.draw.rect(screen, [255, 255, 255, 255], (50, 770, 180, 80), 3)
         self.button1 = pygame.Rect(50, 770, 180, 80)
         label11 = self.myfont.render("Next Player", 1, (255, 255, 255))
@@ -1224,9 +1212,9 @@ class Player():
         if not pause: label13 = self.myfont.render("Pause", 1, (255, 255, 255))
 
         screen.blit(label13, (1530, 20))
-        
-        
+                
 def playgame():
+    os.chdir(".\\InitGame")
     pygame.init()
     pygame.font.init()
     infoObject = pygame.display.Info()
