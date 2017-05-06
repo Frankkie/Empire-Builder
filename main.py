@@ -723,8 +723,10 @@ class AreaScene():
         self.verylargefont = pygame.font.SysFont("Times", 50)
         self.largefont = pygame.font.SysFont("Times", 40)
         self.medfont = pygame.font.SysFont("Times", 25)
+        self.smallfont = pygame.font.SysFont("Times", 20)
         self.ButtonDict = {}
         self.BackToMain = pygame.Rect((1600, 20, 180, 50))
+        self.BuildCapital = pygame.Rect((1600, 175, 180, 50))
         
         self.bar = pygame.image.load("bar.png")
         self.bar = pygame.transform.scale(self.bar, (400, 10))
@@ -788,6 +790,7 @@ class AreaScene():
             self.screen.blit(clock_label, (1820, 20))
             
             self.DrawButton((1600, 20, 180, 50), "Back to Map >>", [1610, 30])
+            self.DrawButton((1600, 175, 180, 50), "Upgrade", [1645, 185])
             self.foodbar.Draw_Bar(self.area[4][5][2], self.bar, self.point)
             self.taxesbar.Draw_Bar(self.area[10], self.bar, self.point)
             self.metalbar.Draw_Bar(self.area[4][0][2], self.bar, self.point)
@@ -825,22 +828,64 @@ class AreaScene():
             for button in self.ButtonDict.keys():
                 if self.ButtonDict[button].collidepoint(mouse_pos):
                     pygame.draw.rect(self.screen, self.white, self.ButtonDict[button], 1)
+
+            if self.BuildCapital.collidepoint(mouse_pos) and self.currentplayer:
+                    self.CapitalHover(mouse_pos)
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.display.quit()
                     sys.exit()
+                
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.BackToMain.collidepoint(mouse_pos):
                         self.WriteInfo()
                         active_scene = MainScene(self.screen, self.NumPlayers, "AreaScene", self.Clock, self.year)
+                    if self.BuildCapital.collidepoint(mouse_pos):
+                        self.CapitalUpgrade()
                     for bar in self.barlist:
                         if bar.pointrect.collidepoint(mouse_pos) and self.currentplayer:
                             temp = bar.drag
                             if temp == True: bar.drag = False
                             if temp == False: bar.drag = True
-                    
             pygame.display.flip()
+
+    def CapitalHover(self, mouse_pos):
+        rect = [self.BuildCapital[0], self.BuildCapital[1] + self.BuildCapital[3] + 20, self.BuildCapital[2] + 60, 200]
+        self.screen.fill([50, 50, 50, 50], tuple(rect))
+        pygame.draw.rect(self.screen, [0, 0, 0, 0], tuple(rect), 3)
+        if self.area[11][0] == 1:
+            caplabel = Label("Cannot upgrade", self.medfont, [rect[0] + 20, rect[1] + 20])
+            costlabel = [Label("", self.smallfont, [rect[0] + 20, rect[1] + 50])]
+            check = -1
+        else:
+            check = 0
+            for everyarea in self.AreaList:
+                if self.area[5] == everyarea[5]:
+                    if everyarea[11][0] == 1: check = 1
+            if check:
+                caplabel = Label("Build new capital", self.medfont, [rect[0] + 20, rect[1] + 20])
+                costlabel = []
+                
+            else:
+                caplabel = Label("Found your capital", self.medfont, [rect[0] + 20, rect[1] + 20])
+                costlabel = [Label("Free", self.smallfont, [rect[0] + 20, rect[1] + 90])]
+
+        caplabel.DrawLabel(self.screen)
+        for label in costlabel:
+            label.DrawLabel(self.screen)
+        self.capital_check = check
+
+    def CapitalUpgrade(self):
+        if self.capital_check == -1:
+            pass
+        elif self.capital_check == 0:
+            self.AreaList[self.area[8]][11][0] = 1
+            self.labellist[11] = Label("- Capital", self.largefont, [1360, 175])
+        else:
+            pass
+
+
         
     def WriteInfo(self):
         f = open("Info.txt", "w")
@@ -1007,9 +1052,9 @@ class AreaScene():
 #=============================================================================================
 
 class Bar():
-    def __init__(self, screen, pos, text, textpos, limits, num):
+    def __init__(self, screen, pos, text, textpos, limits, num, color = (255, 255, 255)):
         self.screen = screen
-        self.white = (255, 255, 255)
+        self.color = color
         self.pos = pos
         self.text = text
         self.textpos = textpos
@@ -1026,7 +1071,7 @@ class Bar():
         self.prop = num/(self.range)
         self.screen.blit(barimage, [self.pos[0], self.pos[1]])
         self.screen.blit(pointimage, [self.pos[0] - 20 + int(self.prop*self.barsize), self.pos[1] - 15])
-        self.label = self.medfont.render(self.text+": "+str(num)+"%", 1, self.white)
+        self.label = self.medfont.render(self.text+": "+str(num)+"%", 1, self.color)
         self.screen.blit(self.label, self.textpos)
         
     def Drag(self, mouse_pos):
