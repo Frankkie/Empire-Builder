@@ -560,19 +560,21 @@ class MainScene():
                         if temp == False: self.pause = True
                         if temp == True: self.pause = False
                         
-            #pygame.image.save(screen, "Final Map.bmp")
             pygame.display.flip()
         return
 
     def UpdateStatistics(self, player):
         total = 0
+        old_food = self.PlayerList[player][4][5]
         food = self.UpdateFood(player)
+        food_production = food - old_food
         for index in range(len(self.AreaList)):
             if self.AreaList[index][5] == self.PlayerList[player][2]:
-                self.AreaList[index][3] = self.UpdatePopulation(self.AreaList[index][3], self.AreaList[index][6], self.AreaList[index][8])
+                self.AreaList[index][3] = self.UpdatePopulation(self.AreaList[index][3], self.AreaList[index][6], self.AreaList[index][8], self.AreaList[index][11])
                 total += self.AreaList[index][3]
         self.PlayerList[player][6] = total
         food_needs = int(total*10)
+        food_remains = (food_production - food_needs)/food_production
         if food >= food_needs:
             food = food - food_needs
         else:
@@ -602,12 +604,15 @@ class MainScene():
         self.UpdateTimber(player)
         self.UpdateFossilFuels(player, 2)
         self.UpdateUranium(player, 3)
+        self.UpdateIncome(player, food_remains)
         self.UpdateCoins(player)
         self.UpdateInfantry(player)
         
 
-    def UpdatePopulation(self, old_pop, moral, basic_gdp):
-        new_pop = old_pop + old_pop*(moral - 50)/100*(1/16)
+    def UpdatePopulation(self, old_pop, moral, basic_gdp, buildings):
+        growth = old_pop*(moral - 50)/100*(1/16)
+        if growth > 0 and buildings[0] == 1: growth = 1.5*growth
+        new_pop = old_pop + growth
         return round(new_pop, 2)
 
     def UpdateFood(self, player):
@@ -673,6 +678,30 @@ class MainScene():
         for troop in (self.PlayerList[player][7]):
             self.TroopList[troop][5][0] += int(math.log(self.AreaList[self.TroopList[troop][4]][3] + 3)*self.AreaList[self.TroopList[troop][4]][6]/100)
 
+    def UpdateIncome(self, player, food_remains):
+        for area in (self.PlayerList[player][3]):
+            old = income = self.AreaList[area][9]
+            buildings = self.AreaList[area][11]
+            production = 0
+            res = self.AreaList[area][4]
+            production += res[0][0]/18000
+            production += res[1][0]/1200
+            production += res[2][0]/6000
+            production += res[3][0]/150
+            production += res[4][0]/3
+            production += res[5][0]/1380
+            income += income*production/(200*math.log(income/1000 + 2))
+            growth = income - old
+            income += income*food_remains/(20*math.log(income/1000 + 1.4))
+            income += income*(self.AreaList[area][6] - 70)/(1000*math.log(income/1000 + 1.4))
+            income += income*(30 - self.AreaList[area][10])/(300)
+            if income < 100: income = 100
+            bonus = 0
+            if buildings[0] == 1: bonus = 30
+            bonus += buildings[0]*30 + buildings[1]*5 + buildings[2]*7 + buildings[3]*5 + buildings[7]*5
+            income += growth*bonus/100
+            self.AreaList[area][9] = income
+
 
 class AreaScene():
     def __init__(self, screen, arealist, clock, numplayers, year, currentplayer):
@@ -724,7 +753,7 @@ class AreaScene():
         else: capital = "- Capital"
 
         self.labellist = [Label(self.area[1], self.hugefont, [int(self.w/2 - len(self.area[1])*19), 20]), Label("- Moral: "+str(round(self.area[6]))+"%", self.largefont, [660, 175]),
-                          Label("- Population: "+str(round(self.area[3], 3))+" million people", self.largefont, [660, 225]), Label("- Per Capita Income:"+str(int(self.area[9]))+" coins", self.largefont, [660, 275]),
+                          Label("- Population: "+str(round(self.area[3], 3))+" million people", self.largefont, [660, 225]), Label("- Per Capita Income: "+str(int(self.area[9]))+" coins", self.largefont, [660, 275]),
                           Label("- Resources", self.verylargefont, [660, 340]),
                           Label("- Food: "+str(int(self.area[4][5][0]))+"/"+str(self.area[4][5][1]), self.largefont, [660, 400]),
                           Label("- Metal: "+str(self.area[4][0][0])+"/"+str(self.area[4][0][1]), self.largefont, [660, 450]),
@@ -1048,7 +1077,7 @@ class Area():
         infoObject = pygame.display.Info()
         w = int(infoObject.current_w/1)
         h = int(infoObject.current_h/1)
-        self.ratio = 270/size
+        self.ratio = 285/size
         rect = [self.location[0] + 20, self.location[1] + 20, size, int(size*self.ratio)]
         self.rect = rect
 
@@ -1069,7 +1098,8 @@ class Area():
                           Label("Timber: "+str(int(self.resources[1][0])), self.mysmallfont, (rect[0] + 10, rect[1] + 162)),
                           Label("Fossil fuels: "+str(int(self.resources[2][0])), self.mysmallfont, (rect[0] + 10, rect[1] + 184)),
                           Label("Uranium: "+str(int(self.resources[3][0])), self.mysmallfont, (rect[0] + 10, rect[1] + 206)),
-                          Label("Renewables: "+(self.resources[4][0]+1)*"#", self.mysmallfont, (rect[0] + 10, rect[1] + 228))]
+                          Label("Renewables: "+(self.resources[4][0]+1)*"#", self.mysmallfont, (rect[0] + 10, rect[1] + 228)),
+                          Label("Income: "+str(int(self.income_capita)), self.mysmallfont, (rect[0] + 10, rect[1] + 250))]
 
     def draw_area(self, screen):
         screen.blit(self.area_point, self.location)
@@ -1081,12 +1111,9 @@ class Area():
         for label in self.LabelList:
             label.DrawLabel(screen)
 
-class Building():
-    pass
 
 class Troop():
     def __init__(self, trooplist, loc):
-
         screen = trooplist[0]
         self.index = trooplist[1]
         self.name = trooplist[2]
@@ -1225,6 +1252,7 @@ def playgame():
     w = int(infoObject.current_w)
     h = int(infoObject.current_h)
     screen = pygame.display.set_mode((w, h), pygame.RESIZABLE)
+    pygame.display.set_caption("Empire Builder 0.2")
     active_scene = MenuScene(screen)
 
 playgame()
