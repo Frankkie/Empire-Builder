@@ -76,6 +76,16 @@ class MainScene():
         screen.fill((0, 0, 0))
         if previous == "MenuScene":
             self.InitializeGame()
+            #print(self.AreaList)
+##            resources = [0, 0, 0, 0, 0, 0]
+##            for area in self.AreaList:
+##                resources[0] += area[4][0][1]
+##                resources[1] += area[4][1][1]
+##                resources[2] += area[4][2][1]
+##                resources[3] += area[4][3][1]
+##                resources[4] += area[4][4][0]
+##                resources[5] += area[4][5][1]
+##            print(resources)
             check = 1
         else:
             self.ReadInfo(screen)
@@ -470,6 +480,7 @@ class MainScene():
         
         self.Clock = clock
         time = pygame.time.Clock()
+        self.player = player
         if player == self.NumPlayers: playername = "c"
         else:
             playername = "p"+str(player + 1)
@@ -542,7 +553,7 @@ class MainScene():
                                 self.WriteInfo()
                                 if self.AreaList[i][5] == playername: currentplayer = True
                                 else: currentplayer = False
-                                self.activescene = AreaScene(self.screen, self.AreaList[i], self.Clock, self.NumPlayers, year, currentplayer)
+                                self.activescene = AreaScene(self.screen, self.AreaList[i], self.Clock, self.NumPlayers, year, currentplayer, self.player)
                         for i in range(len(self.TroopList)):
                             if self.troopdotlist[i].button.collidepoint(mouse_pos):
                                     #Create Troop_display class
@@ -704,7 +715,7 @@ class MainScene():
 
 
 class AreaScene():
-    def __init__(self, screen, arealist, clock, numplayers, year, currentplayer):
+    def __init__(self, screen, arealist, clock, numplayers, year, currentplayer, player):
         self.ReadInfo(screen)
         self.area = arealist
         self.time = pygame.time.Clock()
@@ -715,6 +726,7 @@ class AreaScene():
         self.black = (0, 0, 0)
         self.pause = False
         self.currentplayer = currentplayer
+        self.player = player
         infoObject = pygame.display.Info()
         self.w = int(infoObject.current_w)
         self.h = int(infoObject.current_h)
@@ -857,16 +869,34 @@ class AreaScene():
         if self.area[11][0] == 1:
             caplabel = Label("Cannot upgrade", self.medfont, [rect[0] + 20, rect[1] + 20])
             costlabel = [Label("", self.smallfont, [rect[0] + 20, rect[1] + 50])]
-            check = -1
+            self.capital_check = -1
         else:
-            check = 0
+            self.capital_check = 0
             for everyarea in self.AreaList:
                 if self.area[5] == everyarea[5]:
-                    if everyarea[11][0] == 1: check = 1
-            if check:
+                    if everyarea[11][0] == 1: self.capital_check = 1
+            if self.capital_check == 1:
                 caplabel = Label("Build new capital", self.medfont, [rect[0] + 20, rect[1] + 20])
                 costlabel = []
-                
+                if self.PlayerList[self.player][4][0] < 1000:
+                    costlabel.append(Label("- Metal: "+str(self.PlayerList[self.player][4][0])+"/1000", self.smallfont, [rect[0] + 20, rect[1] + 60], color = (255, 0, 0)))
+                else:
+                    costlabel.append(Label("- Metal: "+str(self.PlayerList[self.player][4][0])+"/1000", self.smallfont, [rect[0] + 20, rect[1] + 60], color = (255, 255, 255)))
+                if self.PlayerList[self.player][4][1] < 3000:
+                    costlabel.append(Label("- Timber: "+str(self.PlayerList[self.player][4][1])+"/3000", self.smallfont, [rect[0] + 20, rect[1] + 80], color = (255, 0, 0)))
+                else:
+                    costlabel.append(Label("- Timber: "+str(self.PlayerList[self.player][4][1])+"/3000", self.smallfont, [rect[0] + 20, rect[1] + 80], color = (255, 255, 255)))
+                    
+                if self.PlayerList[self.player][4][2] + self.PlayerList[self.player][4][3]*20 + self.PlayerList[self.player][4][4]*3 < 1000:
+                    costlabel.append(Label("- Energy: "+str(self.PlayerList[self.player][4][2] + self.PlayerList[self.player][4][3]*20 + self.PlayerList[self.player][4][4]*3 )+"/1000",
+                                           self.smallfont, [rect[0] + 20, rect[1] + 100], color = (255, 0, 0)))
+                else:
+                    costlabel.append(Label("- Energy: "+str(self.PlayerList[self.player][4][2] + self.PlayerList[self.player][4][3]*20 + self.PlayerList[self.player][4][4]*3 )+"/1000",
+                                           self.smallfont, [rect[0] + 20, rect[1] + 100], color = (255, 255, 255)))
+                if self.PlayerList[self.player][5] < 10**11:
+                    costlabel.append(Label("- Coins: "+str(self.PlayerList[self.player][5]//10**9)+"/100 billion", self.smallfont, [rect[0] + 20, rect[1] + 120], color = (255, 0, 0)))
+                else:
+                    costlabel.append(Label("- Coins: "+str(self.PlayerList[self.player][5]//10**9)+"/100 billion", self.smallfont, [rect[0] + 20, rect[1] + 120]))
             else:
                 caplabel = Label("Found your capital", self.medfont, [rect[0] + 20, rect[1] + 20])
                 costlabel = [Label("Free", self.smallfont, [rect[0] + 20, rect[1] + 90])]
@@ -874,18 +904,36 @@ class AreaScene():
         caplabel.DrawLabel(self.screen)
         for label in costlabel:
             label.DrawLabel(self.screen)
-        self.capital_check = check
 
     def CapitalUpgrade(self):
         if self.capital_check == -1:
-            pass
+            return
         elif self.capital_check == 0:
+            self.area[11][0] = 1
             self.AreaList[self.area[8]][11][0] = 1
             self.labellist[11] = Label("- Capital", self.largefont, [1360, 175])
+            self.capital_check = -1
+            return
         else:
-            pass
-
-
+            if self.PlayerList[self.player][4][0] >= 2000 and self.PlayerList[self.player][4][1] >= 3000 and self.PlayerList[self.player][4][2] + self.PlayerList[self.player][4][3]*20 + self.PlayerList[self.player][4][4]*3 >= 1000 and self.PlayerList[self.player][5] >= 10**11:
+                self.PlayerList[self.player][4][0] -= 2000
+                self.PlayerList[self.player][4][1] -= 3000
+                energy = 0
+                while energy < 1000:
+                    if self.PlayerList[self.player][4][2] > 0:
+                        self.PlayerList[self.player][4][2] -= 1
+                        energy += 1
+                    if self.PlayerList[self.player][4][3] > 0:
+                        self.PlayerList[self.player][4][3] -= 1
+                        energy += 20
+                    if self.PlayerList[self.player][4][4] > 0:
+                        self.PlayerList[self.player][4][4] -= 1
+                        energy += 3
+                for area in self.PlayerList[self.player][3]:
+                    if self.AreaList[area][11][0] == 1: self.AreaList[area][11][0] = 0
+                self.area[11][0] = 1
+                self.AreaList[self.area[8]][11][0] = 1
+                self.capital_check = -1
         
     def WriteInfo(self):
         f = open("Info.txt", "w")
@@ -1052,9 +1100,9 @@ class AreaScene():
 #=============================================================================================
 
 class Bar():
-    def __init__(self, screen, pos, text, textpos, limits, num, color = (255, 255, 255)):
+    def __init__(self, screen, pos, text, textpos, limits, num):
         self.screen = screen
-        self.color = color
+        self.color = (255, 255, 255)
         self.pos = pos
         self.text = text
         self.textpos = textpos
@@ -1083,9 +1131,9 @@ class Bar():
         return num
 
 class Label():
-    def __init__(self, text, font, pos):
+    def __init__(self, text, font, pos, color = (255, 255, 255)):
         self.pos = pos
-        self.label = font.render(text, 1, (255, 255, 255))
+        self.label = font.render(text, 1, color)
     def DrawLabel(self, screen):
         screen.blit(self.label, self.pos)
     
@@ -1286,7 +1334,6 @@ class Player():
 
         if pause: label13 = self.myfont.render("Play", 1, (255, 255, 255))
         if not pause: label13 = self.myfont.render("Pause", 1, (255, 255, 255))
-
         screen.blit(label13, (1529, 17))
                 
 def playgame():
