@@ -585,32 +585,23 @@ class MainScene():
                 total += self.AreaList[index][3]
         self.PlayerList[player][6] = total
         food_needs = int(total*10)
-        food_remains = (food_production - food_needs)/food_production
+        if food_production != 0:
+            food_remains = (food_production - food_needs)/food_production
+        else: food_remains = -100
         if food >= food_needs:
             food = food - food_needs
+            portion = 0
         else:
             dead = (food_needs - food)/17
             food = 0
             portion = dead/total
         self.PlayerList[player][4][5] = food
-        try:
-            for index in self.PlayerList[player][3]:
-                self.AreaList[index][3] = round(self.AreaList[index][3] - portion*self.AreaList[index][3], 2)
-                self.AreaList[index][6] = self.AreaList[index][6] - portion*100
-                
-                if self.AreaList[index][6] < 10: self.AreaList[index][6] = 10
-
-        except UnboundLocalError:
-            for index in self.PlayerList[player][3]:
-                self.AreaList[index][6] += 3
-                if self.AreaList[index][6] > 100: self.AreaList[index][6] = 100
+        self.UpdateMoral(player, portion)
         newtotal = 0
-       
         for index in self.PlayerList[player][3]:
+            self.AreaList[index][3] = round(self.AreaList[index][3] - portion*self.AreaList[index][3], 2)
             newtotal += self.AreaList[index][3]
-         
         self.PlayerList[player][6] = round(newtotal, 2)
-        
         self.UpdateMetal(player)
         self.UpdateTimber(player)
         self.UpdateFossilFuels(player, 2)
@@ -619,7 +610,6 @@ class MainScene():
         self.UpdateCoins(player)
         self.UpdateInfantry(player)
         
-
     def UpdatePopulation(self, old_pop, moral, basic_gdp, buildings):
         growth = old_pop*(moral - 50)/100*(1/16)
         if growth > 0 and buildings[0] == 1: growth = 1.5*growth
@@ -702,9 +692,12 @@ class MainScene():
             production += res[4][0]/3
             production += res[5][0]/1380
             income += income*production/(200*math.log(income/1000 + 2))
+            if income < 100: income = 100
             growth = income - old
             income += income*food_remains/(20*math.log(income/1000 + 1.4))
+            if income < 100: income = 100
             income += income*(self.AreaList[area][6] - 70)/(1000*math.log(income/1000 + 1.4))
+            if income < 100: income = 100
             income += income*(30 - self.AreaList[area][10])/(300)
             if income < 100: income = 100
             bonus = 0
@@ -712,6 +705,22 @@ class MainScene():
             bonus += buildings[0]*30 + buildings[1]*5 + buildings[2]*7 + buildings[3]*5 + buildings[7]*5
             income += growth*bonus/100
             self.AreaList[area][9] = income
+
+    def UpdateMoral(self, player, portion):
+        for area in self.PlayerList[player][3]:
+            moral = self.AreaList[area][6]
+            lowest_moral = 10
+            if self.AreaList[area][11][0] == 1: lowest_moral = 35
+            else: lowest_moral += 4*self.AreaList[area][11][5]
+            if portion:
+                moral = moral - portion*100
+            elif portion == 0:
+                moral += 2
+            if moral < lowest_moral: moral = lowest_moral
+            if moral > 100: moral = 100
+            self.AreaList[area][6] = moral
+            
+            
 
 
 class AreaScene():
@@ -1189,8 +1198,6 @@ class AreaScene():
                           Label("- University: lvl. "+str(self.area[11][6]), self.largefont, (1360, 580)),
                           Label(bank, self.largefont, (1360, 660)),]
 
-            
-        
     def WriteInfo(self):
         f = open("Info.txt", "w")
         for area in self.AreaList:
@@ -1460,7 +1467,6 @@ class Area():
         for label in self.LabelList:
             label.DrawLabel(screen)
 
-
 class Troop():
     def __init__(self, trooplist, loc):
         screen = trooplist[0]
@@ -1527,8 +1533,7 @@ class Troop():
         screen.blit(label8, (rect[0] + 10, rect[1] + 185))
         screen.blit(label9, (rect[0] + 10, rect[1] + 205))
         screen.blit(label10, (rect[0] + 10, rect[1] + 230))
-        
-        
+          
 class Troop_Display():
     pass       
 
