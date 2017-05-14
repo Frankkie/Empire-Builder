@@ -598,6 +598,7 @@ class MainScene():
         self.PlayerList[player][4][5] = food
         self.UpdateMoral(player, portion)
         newtotal = 0
+        #Make function CalculateDeaths(self)
         for index in self.PlayerList[player][3]:
             self.AreaList[index][3] = round(self.AreaList[index][3] - portion*self.AreaList[index][3], 2)
             newtotal += self.AreaList[index][3]
@@ -619,8 +620,10 @@ class MainScene():
     def UpdateFood(self, player):
         food =  self.PlayerList[player][4][5]
         for index in (self.PlayerList[player][3]):
+            buildings = self.AreaList[index][11]
             temp = self.AreaList[index][4][5][0]*self.AreaList[index][4][5][2]*(1/500)*(math.sin(3.14/200*self.AreaList[index][6]) + 0.24)
-            food += int(temp)
+            bonus = temp*0.02*buildings[1] + temp*0.02*buildings[2] + temp*0.02*buildings[3]
+            food += int(temp + bonus)
             self.AreaList[index][4][5][0] = self.AreaList[index][4][5][0] - int(temp) + self.AreaList[index][4][5][1]/5
         self.PlayerList[player][4][5] = food
         return food
@@ -628,45 +631,54 @@ class MainScene():
     def UpdateMetal(self, player):
         metal = self.PlayerList[player][4][0]
         for index in (self.PlayerList[player][3]):
+            buildings = self.AreaList[index][11]
             if self.AreaList[index][4][0][0]*2 >= self.AreaList[index][4][0][1]: temp = (self.AreaList[index][6]/100)*self.AreaList[index][4][0][1]*self.AreaList[index][4][0][2]/1000
             else: temp = (2/5)*((self.AreaList[index][4][0][0]**2)/self.AreaList[index][4][0][1])*(self.AreaList[index][6]/100)*(self.AreaList[index][4][0][2]/100)
+            self.AreaList[index][4][0][0] = self.AreaList[index][4][0][0] - int(temp)
+            bonus = temp*0.02*buildings[1] + temp*0.02*buildings[2] + temp*0.02*buildings[3]
             if temp < 1:
                 pass
             else:
-                metal += int(temp)
-                self.AreaList[index][4][0][0] = self.AreaList[index][4][0][0] - int(temp)
+                metal += int(temp + bonus)   
         self.PlayerList[player][4][0] = metal
 
     def UpdateTimber(self, player):
         timber = self.PlayerList[player][4][1]
         for index in (self.PlayerList[player][3]):
+            buildings = self.AreaList[index][11]
             temp = self.AreaList[index][4][1][0]*self.AreaList[index][4][1][2]*(1/500)*(math.sin(3.14/200*self.AreaList[index][6]) + 0.24)
-            timber += int(temp)
+            bonus = temp*0.02*buildings[1] + temp*0.02*buildings[2] + temp*0.02*buildings[3]
+            timber += int(temp + bonus)
             self.AreaList[index][4][1][0] = self.AreaList[index][4][1][0] - int(temp) + self.AreaList[index][4][1][1]/5
         self.PlayerList[player][4][1] = timber
 
     def UpdateFossilFuels(self, player, mine = 2):
         mined = self.PlayerList[player][4][mine]
         for index in (self.PlayerList[player][3]):
+            buildings = self.AreaList[index][11]
             if self.AreaList[index][4][mine][0]*2 >= self.AreaList[index][4][mine][1]: temp = (self.AreaList[index][6]/100)*self.AreaList[index][4][mine][1]*self.AreaList[index][4][mine][2]/1000
             else: temp = (2/5)*((self.AreaList[index][4][mine][0]**2)/self.AreaList[index][4][mine][1])*(self.AreaList[index][6]/100)*(self.AreaList[index][4][mine][2]/100)
-            if temp < 1:
+            bonus = temp*0.02*buildings[1] + temp*0.02*buildings[2] + temp*0.02*buildings[3]
+            if temp + bonus < 1:
                 pass
             else:
-                mined += int(temp)
+                mined += int(temp + bonus)
                 self.AreaList[index][4][mine][0] = self.AreaList[index][4][mine][0] - int(temp)
         self.PlayerList[player][4][mine] = mined
 
     def UpdateUranium(self, player, mine = 3):
         mined = self.PlayerList[player][4][mine]
         for index in (self.PlayerList[player][3]):
-            if self.AreaList[index][4][mine][0]*2 >= self.AreaList[index][4][mine][1]: temp = (self.AreaList[index][6]/100)*self.AreaList[index][4][mine][1]*self.AreaList[index][4][mine][2]/1000
-            else: temp = (2/5)*((self.AreaList[index][4][mine][0]**2)/self.AreaList[index][4][mine][1])*(self.AreaList[index][6]/100)*(self.AreaList[index][4][mine][2]/100)
-            if temp < 1:
-                pass
-            else:
-                mined += int(temp)
-                self.AreaList[index][4][mine][0] = self.AreaList[index][4][mine][0] - int(temp)
+            if self.AreaList[index][11][1] >= 1 and self.AreaList[index][11][6] >= 1:
+                buildings = self.AreaList[index][11]
+                if self.AreaList[index][4][mine][0]*2 >= self.AreaList[index][4][mine][1]: temp = (self.AreaList[index][6]/100)*self.AreaList[index][4][mine][1]*self.AreaList[index][4][mine][2]/1000
+                else: temp = (2/5)*((self.AreaList[index][4][mine][0]**2)/self.AreaList[index][4][mine][1])*(self.AreaList[index][6]/100)*(self.AreaList[index][4][mine][2]/100)
+                bonus = temp*0.02*buildings[1] + temp*0.02*buildings[2] + temp*0.02*buildings[3]
+                if temp + bonus < 1:
+                    pass
+                else:
+                    mined += int(temp + bonus)
+                    self.AreaList[index][4][mine][0] = self.AreaList[index][4][mine][0] - int(temp)
         self.PlayerList[player][4][mine] = mined
 
     def UpdateCoins(self, player):
@@ -716,6 +728,13 @@ class MainScene():
                 moral = moral - portion*100
             elif portion == 0:
                 moral += 2
+            if self.AreaList[area][11][0] == 1:
+                moral += 2
+                for neib in self.AreaList[area][7]:
+                    if neib in self.PlayerList[player][3]:
+                        self.AreaList[neib][6] += 1
+            moral += self.AreaList[area][11][4]*0.2
+            moral -= self.AreaList[area][10]/33
             if moral < lowest_moral: moral = lowest_moral
             if moral > 100: moral = 100
             self.AreaList[area][6] = moral
