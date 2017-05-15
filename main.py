@@ -1,5 +1,7 @@
-import pygame, sys, os, random, datetime, math
+import pygame, sys, os, random, datetime, math, gc
 from pygame import font
+
+gc.enable()
 
 class MenuScene():
     def __init__(self, screen):
