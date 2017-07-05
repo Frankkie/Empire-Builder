@@ -1,6 +1,6 @@
 import pygame, sys, os, random, datetime, math, gc
 from pygame import font
-
+import ctypes
 gc.enable()
 
 class MenuScene():
@@ -1622,10 +1622,11 @@ def playgame():
     os.chdir(".\\InitGame")
     pygame.init()
     pygame.font.init()
-    infoObject = pygame.display.Info()
-    w = int(infoObject.current_w)
-    h = int(infoObject.current_h)
-    screen = pygame.display.set_mode((w, h), pygame.RESIZABLE)
+    ctypes.windll.user32.SetProcessDPIAware()
+    user32 = ctypes.windll.user32
+    w = int(user32.GetSystemMetrics(0))
+    h = int(user32.GetSystemMetrics(1))
+    screen = pygame.display.set_mode((w, h), pygame.FULLSCREEN)
     pygame.display.set_caption("Empire Builder 0.2")
     active_scene = MenuScene(screen)
 
