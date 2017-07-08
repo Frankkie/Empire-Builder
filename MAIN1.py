@@ -2,6 +2,7 @@ import pygame, sys, os, random, datetime, math, ctypes
 from pygame import font
 
 import OBJECTS as OBJ
+import GENERAL as GEN
 import AREA
 
 
@@ -9,6 +10,11 @@ class MainScene():
     def __init__(self, screen, NumPlayers, previous, clock, year):
         self.NumPlayers = NumPlayers
         self.screen = screen
+        metrics = GEN.screen_metrics()
+        self.w = metrics[0]
+        self.h = metrics[1]
+        self.ratiow = metrics[2]
+        self.ratioh = metrics[3]
         screen.fill((0, 0, 0))
         if previous == "MenuScene":
             self.InitializeGame()
@@ -63,8 +69,8 @@ class MainScene():
             temp = []
             temp2 = []
             line = line.split(",")
-            temp.append(int(line[1]))
-            temp.append(int(line[2]))
+            temp.append(int(int(line[1])*self.ratiow))
+            temp.append(int(int(line[2])*self.ratioh))
             line[3] = int(line[3])
             line[6] = int(line[6])
             temp2 = line[7].split(".")
@@ -412,15 +418,12 @@ class MainScene():
             playername = "p"+str(player + 1)
         
         self.pause = False
-        infoObject = pygame.display.Info()
-        self.w = int(infoObject.current_w)
-        self.h = int(infoObject.current_h)
         self.background = pygame.image.load("Colored Map, black sea.bmp")
         self.background = pygame.transform.scale(self.background, (int(self.w/1.05), int(self.h/1.05)))
 
-        self.verylargefont = pygame.font.SysFont("Times", 50)
-        self.largefont = pygame.font.SysFont("Times", 40)
-        self.mediumfont = pygame.font.SysFont("Times", 25)
+        self.verylargefont = pygame.font.SysFont("Times", int(50*self.ratiow))
+        self.largefont = pygame.font.SysFont("Times", int(40*self.ratiow))
+        self.mediumfont = pygame.font.SysFont("Times", int(25*self.ratiow))
         
         self.areadotlist = []
         self.troopdotlist = []
@@ -451,7 +454,7 @@ class MainScene():
 
             self.current_player = OBJ.Player(self.PlayerList[player], self.pause)
             yearlabel = self.mediumfont.render("Year: "+str(year), 1, (255, 255, 255))
-            screen.blit(yearlabel, [10, 10])
+            screen.blit(yearlabel, [int(10*self.ratiow), int(10*self.ratioh)])
 
             mouse_pos = pygame.mouse.get_pos()
             
@@ -467,7 +470,7 @@ class MainScene():
             if self.Clock%60 < 10: clock_ = str(int(self.Clock/60))+":0"+str(int(self.Clock%60))
             
             clock_label = self.largefont.render(clock_, 1, (255, 255, 255))
-            screen.blit(clock_label, (1680, 10))
+            screen.blit(clock_label, (int(1680*self.ratiow), int(10*self.ratioh)))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.display.quit()

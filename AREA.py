@@ -3,7 +3,7 @@ from pygame import font
 import ctypes
 import GUI
 import MAIN1 as MAIN
-
+import GENERAL as GEN
 gc.enable()
 
 class AreaScene():
@@ -19,73 +19,80 @@ class AreaScene():
         self.pause = False
         self.currentplayer = currentplayer
         self.player = player
-        infoObject = pygame.display.Info()
-        self.w = int(infoObject.current_w)
-        self.h = int(infoObject.current_h)
+        metrics = GEN.screen_metrics()
+        self.w = metrics[0]
+        self.h = metrics[1]
+        self.ratiow = metrics[2]
+        self.ratioh = metrics[3]
         self.screen = screen
-        self.hugefont = pygame.font.SysFont("Times", 80)
-        self.verylargefont = pygame.font.SysFont("Times", 50)
-        self.largefont = pygame.font.SysFont("Times", 40)
-        self.medfont = pygame.font.SysFont("Times", 25)
-        self.smallfont = pygame.font.SysFont("Times", 20)
+        self.hugefont = pygame.font.SysFont("Times", int(80*self.ratiow))
+        self.verylargefont = pygame.font.SysFont("Times", int(50*self.ratiow))
+        self.largefont = pygame.font.SysFont("Times", int(40*self.ratiow))
+        self.medfont = pygame.font.SysFont("Times", int(25*self.ratiow))
+        self.smallfont = pygame.font.SysFont("Times", int(20*self.ratiow))
         self.ButtonDict = {}
-        self.BackToMain = pygame.Rect((1600, 20, 180, 50))
-        self.BuildCapital = pygame.Rect((1660, 170, 180, 50))
-        self.BuildFactory = pygame.Rect((1660, 255, 180, 50))
-        self.BuildPort = pygame.Rect((1660, 315, 180, 50))
-        self.BuildAirPort = pygame.Rect((1660, 375, 180, 50))
-        self.BuildFort = pygame.Rect((1660, 455, 180, 50))
-        self.BuildHospital = pygame.Rect((1660, 515, 180, 50))
-        self.BuildUni = pygame.Rect((1660, 575, 180, 50))
-        self.BuildBank = pygame.Rect((1660, 655, 180, 50))
+        buttonw = int(180*self.ratiow)
+        buttonh = int(50*self.ratioh)
+        marg = int(1660*self.ratiow)
+        self.BackToMain = pygame.Rect((int(1600*self.ratiow), int(20*self.ratioh), buttonw, buttonh))
+        self.BuildCapital = pygame.Rect((marg, int(170*self.ratioh), buttonw, buttonh))
+        self.BuildFactory = pygame.Rect((marg, int(255*self.ratioh), buttonw, buttonh))
+        self.BuildPort = pygame.Rect((marg, int(315*self.ratioh), buttonw, buttonh))
+        self.BuildAirPort = pygame.Rect((marg, int(375*self.ratioh), buttonw, buttonh))
+        self.BuildFort = pygame.Rect((marg, int(455*self.ratioh), buttonw, buttonh))
+        self.BuildHospital = pygame.Rect((marg, int(515*self.ratioh), buttonw, buttonh))
+        self.BuildUni = pygame.Rect((marg, int(575*self.ratioh), buttonw, buttonh))
+        self.BuildBank = pygame.Rect((marg, int(655*self.ratioh), buttonw, buttonh))
         
         self.bar = pygame.image.load("bar.png")
-        self.bar = pygame.transform.scale(self.bar, (400, 10))
+        self.bar = pygame.transform.scale(self.bar, (int(400*self.ratiow), int(10*self.ratioh)))
         self.point = pygame.image.load("point.png")
-        self.point = pygame.transform.scale(self.point, (40, 40))
+        self.point = pygame.transform.scale(self.point, (int(40*self.ratiow), int(40*self.ratioh)))
         self.playerdot = pygame.image.load(self.area[5]+".png")
-        self.playerdot = pygame.transform.scale(self.playerdot, (50, 50))
+        self.playerdot = pygame.transform.scale(self.playerdot, (buttonh, buttonh))
         self.barlist = []
-        
-        self.taxesbar = GUI.Bar(self.screen, [50, 200], "Taxes", [60, 220], [0, 100], self.area[10])
+        marg = int(60*self.ratiow)
+        marg2 = marg//10
+        self.taxesbar = GUI.Bar(self.screen, [marg - marg2, int(200*self.ratioh)], "Taxes", [marg, int(220*self.ratioh)], [0, 100], self.area[10])
         self.barlist.append(self.taxesbar)
-        self.foodbar = GUI.Bar(self.screen, [50, 280], "Food", [60, 300], [0, 200], self.area[4][5][2])
+        self.foodbar = GUI.Bar(self.screen, [marg - marg2, int(280*self.ratioh)], "Food", [marg, int(300*self.ratioh)], [0, 200], self.area[4][5][2])
         self.barlist.append(self.foodbar)
-        self.metalbar = GUI.Bar(self.screen, [50, 360], "Metal", [60, 380], [0, 100], self.area[4][0][2])
+        self.metalbar = GUI.Bar(self.screen, [marg - marg2, int(360*self.ratioh)], "Metal", [marg, int(380*self.ratioh)], [0, 100], self.area[4][0][2])
         self.barlist.append(self.metalbar)
-        self.timberbar = GUI.Bar(self.screen, [50, 440], "Timber", [60, 460], [0, 100], self.area[4][1][2])
+        self.timberbar = GUI.Bar(self.screen, [marg - marg2, int(440*self.ratioh)], "Timber", [marg, int(460*self.ratioh)], [0, 100], self.area[4][1][2])
         self.barlist.append(self.timberbar)
-        self.fossilbar = GUI.Bar(self.screen, [50, 520], "Fossils", [60, 540], [0, 100], self.area[4][2][2])
+        self.fossilbar = GUI.Bar(self.screen, [marg - marg2, int(520*self.ratioh)], "Fossils", [marg, int(540*self.ratioh)], [0, 100], self.area[4][2][2])
         self.barlist.append(self.fossilbar)
-        self.uraniumbar = GUI.Bar(self.screen, [50, 600], "Uranium", [60, 620], [0, 100], self.area[4][3][2])
+        self.uraniumbar = GUI.Bar(self.screen, [marg - marg2, int(600*self.ratioh)], "Uranium", [marg, int(620*self.ratioh)], [0, 100], self.area[4][3][2])
         self.barlist.append(self.uraniumbar)
-        self.renewbar = GUI.Bar(self.screen, [50, 680], "Renewables", [60, 700], [0, 100], self.area[4][4][1])
+        self.renewbar = GUI.Bar(self.screen, [marg - marg2, int(680*self.ratioh)], "Renewables", [marg, int(700*self.ratioh)], [0, 100], self.area[4][4][1])
         self.barlist.append(self.renewbar)
 
         if self.area[11][0] == 0: capital = "- Not Capital"
         else: capital = "- Capital"
         if self.area[11][7] == 0: bank = "- No bank"
         else: bank = "- Bank"
-
-        self.labellist = [GUI.Label(self.area[1], self.hugefont, [int(self.w/2 - len(self.area[1])*19), 20]),
-                          GUI.Label("- Moral: "+str(round(self.area[6]))+"%", self.largefont, [660, 175]),
-                          GUI.Label("- Population: "+str(round(self.area[3], 3))+" million people", self.largefont, [660, 225]),
-                          GUI.Label("- Per Capita Income: "+str(int(self.area[9]))+" coins", self.largefont, [660, 275]),
-                          GUI.Label("- Resources", self.verylargefont, [660, 340]),
-                          GUI.Label("- Food: "+str(int(self.area[4][5][0]))+"/"+str(self.area[4][5][1]), self.largefont, [660, 400]),
-                          GUI.Label("- Metal: "+str(self.area[4][0][0])+"/"+str(self.area[4][0][1]), self.largefont, [660, 450]),
-                          GUI.Label("- Timber: "+str(int(self.area[4][1][0]))+"/"+str(self.area[4][1][1]), self.largefont, [660, 500]),
-                          GUI.Label("- Fossil Fuels: "+str(self.area[4][2][0])+"/"+str(self.area[4][2][1]), self.largefont, [660, 550]),
-                          GUI.Label("- Uranium: "+str(self.area[4][3][0])+"/"+str(self.area[4][3][1]), self.largefont, [660, 600]),
-                          GUI.Label("- Renewables: "+"| "+(self.area[4][4][0] + 1)*"+"+(6 - self.area[4][4][0])*" "+"|", self.largefont, [660, 650]),
-                          GUI.Label(capital, self.largefont, [1360, 175]),
-                          GUI.Label("- Factory: lvl. "+str(self.area[11][1]), self.largefont, (1360, 260)),
-                          GUI.Label("- Port: lvl. "+str(self.area[11][2]), self.largefont, (1360, 320)),
-                          GUI.Label("- Airport: lvl. "+str(self.area[11][3]), self.largefont, (1360, 380)),
-                          GUI.Label("- Fort: lvl. "+str(self.area[11][4]), self.largefont, (1360, 460)),
-                          GUI.Label("- Hospital: lvl. "+str(self.area[11][5]), self.largefont, (1360, 520)),
-                          GUI.Label("- University: lvl. "+str(self.area[11][6]), self.largefont, (1360, 580)),
-                          GUI.Label(bank, self.largefont, (1360, 660)),]
+        marg = int(660*self.ratiow)
+        marg2 = int(1360*self.ratiow)
+        self.labellist = [GUI.Label(self.area[1], self.hugefont, [int(self.w/2 - len(self.area[1])*19), int(20*self.ratioh)]),
+                          GUI.Label("- Moral: "+str(round(self.area[6]))+"%", self.largefont, [marg, int(175*self.ratioh)]),
+                          GUI.Label("- Population: "+str(round(self.area[3], 3))+" million people", self.largefont, [marg, int(225*self.ratioh)]),
+                          GUI.Label("- Per Capita Income: "+str(int(self.area[9]))+" coins", self.largefont, [marg, int(275*self.ratioh)]),
+                          GUI.Label("- Resources", self.verylargefont, [marg, int(340*self.ratioh)]),
+                          GUI.Label("- Food: "+str(int(self.area[4][5][0]))+"/"+str(self.area[4][5][1]), self.largefont, [marg, int(400*self.ratioh)]),
+                          GUI.Label("- Metal: "+str(self.area[4][0][0])+"/"+str(self.area[4][0][1]), self.largefont, [marg, int(450*self.ratioh)]),
+                          GUI.Label("- Timber: "+str(int(self.area[4][1][0]))+"/"+str(self.area[4][1][1]), self.largefont, [marg, int(500*self.ratioh)]),
+                          GUI.Label("- Fossil Fuels: "+str(self.area[4][2][0])+"/"+str(self.area[4][2][1]), self.largefont, [marg, int(550*self.ratioh)]),
+                          GUI.Label("- Uranium: "+str(self.area[4][3][0])+"/"+str(self.area[4][3][1]), self.largefont, [marg, int(600*self.ratioh)]),
+                          GUI.Label("- Renewables: "+"| "+(self.area[4][4][0] + 1)*"+"+(6 - self.area[4][4][0])*" "+"|", self.largefont, [marg, int(650*self.ratioh)]),
+                          GUI.Label(capital, self.largefont, [marg2, int(175*self.ratioh)]),
+                          GUI.Label("- Factory: lvl. "+str(self.area[11][1]), self.largefont, (marg2, int(260*self.ratioh))),
+                          GUI.Label("- Port: lvl. "+str(self.area[11][2]), self.largefont, (marg2, int(320*self.ratioh))),
+                          GUI.Label("- Airport: lvl. "+str(self.area[11][3]), self.largefont, (marg2, int(380*self.ratioh))),
+                          GUI.Label("- Fort: lvl. "+str(self.area[11][4]), self.largefont, (marg2, int(460*self.ratioh))),
+                          GUI.Label("- Hospital: lvl. "+str(self.area[11][5]), self.largefont, (marg2, int(520*self.ratioh))),
+                          GUI.Label("- University: lvl. "+str(self.area[11][6]), self.largefont, (marg2, int(580*self.ratioh))),
+                          GUI.Label(bank, self.largefont, (marg2, int(660*self.ratioh))),]
         
         self.Draw()
         
@@ -101,7 +108,7 @@ class AreaScene():
     def Draw(self):
         while 1:
             self.screen.fill((50, 50, 50))
-            self.screen.blit(self.playerdot, (int(self.w/2) + 19*len(self.area[1]) + 20, 50))
+            self.screen.blit(self.playerdot, (int(self.w/2 + 19*self.ratiow*len(self.area[1])) + 20, int(50*self.ratioh)))
             dt = self.time.tick()
             self.Clock -= dt/1000
             if self.Clock < 0:
@@ -109,17 +116,20 @@ class AreaScene():
             clock_ = str(int(self.Clock/60))+":"+str(int(self.Clock%60))
             if self.Clock%60 < 10: clock_ = str(int(self.Clock/60))+":0"+str(int(self.Clock%60))            
             clock_label = self.largefont.render(clock_, 1, (255, 255, 255))
-            self.screen.blit(clock_label, (1820, 20))
-            
-            self.DrawButton((1600, 20, 180, 50), "Back to Map >>", [1610, 30])
-            self.DrawButton((1660, 170, 180, 50), "Upgrade", [1708, 179])
-            self.DrawButton((1660, 255, 180, 50), "Upgrade", [1708, 264])
-            self.DrawButton((1660, 375, 180, 50), "Upgrade", [1708, 384])
-            self.DrawButton((1660, 455, 180, 50), "Upgrade", [1708, 464])
-            self.DrawButton((1660, 515, 180, 50), "Upgrade", [1708, 524])
-            self.DrawButton((1660, 575, 180, 50), "Upgrade", [1708, 584])
-            self.DrawButton((1660, 655, 180, 50), "Upgrade", [1708, 664])
-            self.DrawButton((1660, 315, 180, 50), "Upgrade", [1708, 324])
+            self.screen.blit(clock_label, (int(1820*self.ratiow), int(20*self.ratioh)))
+            marg1 = int(1660*self.ratiow)
+            marg2 = int(1708*self.ratioh)
+            buttonw = int(180*self.ratiow)
+            buttonh = int(50*self.ratioh)
+            self.DrawButton((int(1600*self.ratiow), int(20*self.ratioh), buttonw, buttonh), "Back to Map >>", [int(1610*self.ratiow), int(30*self.ratioh)])
+            self.DrawButton((marg1, int(170*self.ratioh), buttonw, buttonh), "Upgrade", [marg2, int(179*self.ratioh)])
+            self.DrawButton((marg1, int(255*self.ratioh), buttonw, buttonh), "Upgrade", [marg2, int(264*self.ratioh)])
+            self.DrawButton((marg1, int(375*self.ratioh), buttonw, buttonh), "Upgrade", [marg2, int(384*self.ratioh)])
+            self.DrawButton((marg1, int(455*self.ratioh), buttonw, buttonh), "Upgrade", [marg2, int(464*self.ratioh)])
+            self.DrawButton((marg1, int(515*self.ratioh), buttonw, buttonh), "Upgrade", [marg2, int(524*self.ratioh)])
+            self.DrawButton((marg1, int(575*self.ratioh), buttonw, buttonh), "Upgrade", [marg2, int(584*self.ratioh)])
+            self.DrawButton((marg1, int(655*self.ratioh), buttonw, buttonh), "Upgrade", [marg2, int(664*self.ratioh)])
+            self.DrawButton((marg1, int(315*self.ratioh), buttonw, buttonh), "Upgrade", [marg2, int(324*self.ratioh)])
             
             self.foodbar.Draw_Bar(self.area[4][5][2], self.bar, self.point)
             self.taxesbar.Draw_Bar(self.area[10], self.bar, self.point)
@@ -190,22 +200,23 @@ class AreaScene():
                     if self.BackToMain.collidepoint(mouse_pos):
                         self.WriteInfo()
                         active_scene = MAIN.MainScene(self.screen, self.NumPlayers, "AreaScene", self.Clock, self.year)
-                    if self.BuildCapital.collidepoint(mouse_pos):
-                        self.CapitalUpgrade()
-                    if self.BuildFactory.collidepoint(mouse_pos):
-                        self.BuildingUpgrade("factory")
-                    if self.BuildPort.collidepoint(mouse_pos):
-                        self.BuildingUpgrade("port")
-                    if self.BuildAirPort.collidepoint(mouse_pos):
-                        self.BuildingUpgrade("airport")
-                    if self.BuildFort.collidepoint(mouse_pos):
-                        self.BuildingUpgrade("fort")
-                    if self.BuildHospital.collidepoint(mouse_pos):
-                        self.BuildingUpgrade("hospital")
-                    if self.BuildUni.collidepoint(mouse_pos):
-                        self.BuildingUpgrade("university")
-                    if self.BuildBank.collidepoint(mouse_pos):
-                        self.BuildingUpgrade("bank")
+                    if self.currentplayer:
+                        if self.BuildCapital.collidepoint(mouse_pos):
+                            self.CapitalUpgrade()
+                        if self.BuildFactory.collidepoint(mouse_pos):
+                            self.BuildingUpgrade("factory")
+                        if self.BuildPort.collidepoint(mouse_pos):
+                            self.BuildingUpgrade("port")
+                        if self.BuildAirPort.collidepoint(mouse_pos):
+                            self.BuildingUpgrade("airport")
+                        if self.BuildFort.collidepoint(mouse_pos):
+                            self.BuildingUpgrade("fort")
+                        if self.BuildHospital.collidepoint(mouse_pos):
+                            self.BuildingUpgrade("hospital")
+                        if self.BuildUni.collidepoint(mouse_pos):
+                            self.BuildingUpgrade("university")
+                        if self.BuildBank.collidepoint(mouse_pos):
+                            self.BuildingUpgrade("bank")
                     
                     for bar in self.barlist:
                         if bar.pointrect.collidepoint(mouse_pos) and self.currentplayer:
@@ -215,12 +226,14 @@ class AreaScene():
             pygame.display.flip()
 
     def CapitalHover(self):
-        rect = [self.BuildCapital[0], self.BuildCapital[1] + self.BuildCapital[3] + 20, self.BuildCapital[2] + 60, 200]
+        extraw = int(self.ratiow*20)
+        extrah = int(self.ratioh*20)
+        rect = [self.BuildCapital[0], self.BuildCapital[1] + self.BuildCapital[3] + extrah, self.BuildCapital[2] + int(60*self.ratiow), int(200*self.ratioh)]
         self.screen.fill([50, 50, 50, 50], tuple(rect))
         pygame.draw.rect(self.screen, [0, 0, 0, 0], tuple(rect), 3)
         if self.area[11][0] == 1:
-            caplabel = GUI.Label("Cannot upgrade", self.medfont, [rect[0] + 20, rect[1] + 20])
-            costlabel = [GUI.Label("", self.smallfont, [rect[0] + 20, rect[1] + 50])]
+            caplabel = GUI.Label("Cannot upgrade", self.medfont, [rect[0] + extraw, rect[1] + extrah])
+            costlabel = [GUI.Label("", self.smallfont, [rect[0] + extraw, rect[1] + int(50*self.ratioh)])]
             self.capital_check = -1
         else:
             self.capital_check = 0
@@ -228,30 +241,30 @@ class AreaScene():
                 if self.area[5] == everyarea[5]:
                     if everyarea[11][0] == 1: self.capital_check = 1
             if self.capital_check == 1:
-                caplabel = GUI.Label("Build new capital", self.medfont, [rect[0] + 20, rect[1] + 20])
+                caplabel = GUI.Label("Build new capital", self.medfont, [rect[0] + extraw, rect[1] + extrah])
                 costlabel = []
                 if self.PlayerList[self.player][4][0] < 1000:
-                    costlabel.append(GUI.Label("- Metal: "+str(self.PlayerList[self.player][4][0])+"/1000", self.smallfont, [rect[0] + 20, rect[1] + 60], color = (255, 0, 0)))
+                    costlabel.append(GUI.Label("- Metal: "+str(self.PlayerList[self.player][4][0])+"/1000", self.smallfont, [rect[0] + extraw, rect[1] + int(60*self.ratioh)], color = (255, 0, 0)))
                 else:
-                    costlabel.append(GUI.Label("- Metal: "+str(self.PlayerList[self.player][4][0])+"/1000", self.smallfont, [rect[0] + 20, rect[1] + 60], color = (255, 255, 255)))
+                    costlabel.append(GUI.Label("- Metal: "+str(self.PlayerList[self.player][4][0])+"/1000", self.smallfont, [rect[0] + extraw, rect[1] + int(60*self.ratioh)], color = (255, 255, 255)))
                 if self.PlayerList[self.player][4][1] < 3000:
-                    costlabel.append(GUI.Label("- Timber: "+str(self.PlayerList[self.player][4][1])+"/3000", self.smallfont, [rect[0] + 20, rect[1] + 90], color = (255, 0, 0)))
+                    costlabel.append(GUI.Label("- Timber: "+str(self.PlayerList[self.player][4][1])+"/3000", self.smallfont, [rect[0] + extraw, rect[1] + int(90*self.ratioh)], color = (255, 0, 0)))
                 else:
-                    costlabel.append(GUI.Label("- Timber: "+str(self.PlayerList[self.player][4][1])+"/3000", self.smallfont, [rect[0] + 20, rect[1] + 90], color = (255, 255, 255)))
+                    costlabel.append(GUI.Label("- Timber: "+str(self.PlayerList[self.player][4][1])+"/3000", self.smallfont, [rect[0] + extraw, rect[1] + int(90*self.ratioh)], color = (255, 255, 255)))
                     
                 if self.PlayerList[self.player][4][2] + self.PlayerList[self.player][4][3]*20 + self.PlayerList[self.player][4][4]*3 < 1000:
                     costlabel.append(GUI.Label("- Energy: "+str(self.PlayerList[self.player][4][2] + self.PlayerList[self.player][4][3]*20 + self.PlayerList[self.player][4][4]*3 )+"/1000",
-                                           self.smallfont, [rect[0] + 20, rect[1] + 120], color = (255, 0, 0)))
+                                           self.smallfont, [rect[0] + extraw, rect[1] + int(120*self.ratioh)], color = (255, 0, 0)))
                 else:
                     costlabel.append(GUI.Label("- Energy: "+str(self.PlayerList[self.player][4][2] + self.PlayerList[self.player][4][3]*20 + self.PlayerList[self.player][4][4]*3 )+"/1000",
-                                           self.smallfont, [rect[0] + 20, rect[1] + 120], color = (255, 255, 255)))
+                                           self.smallfont, [rect[0] + extraw, rect[1] + int(120*self.ratioh)], color = (255, 255, 255)))
                 if self.PlayerList[self.player][5] < 10**11:
-                    costlabel.append(GUI.Label("- Coins: "+str(self.PlayerList[self.player][5]//10**9)+"/100 billion", self.smallfont, [rect[0] + 20, rect[1] + 150], color = (255, 0, 0)))
+                    costlabel.append(GUI.Label("- Coins: "+str(self.PlayerList[self.player][5]//10**9)+"/100 billion", self.smallfont, [rect[0] + extraw, rect[1] + int(150*self.ratioh)], color = (255, 0, 0)))
                 else:
-                    costlabel.append(GUI.Label("- Coins: "+str(self.PlayerList[self.player][5]//10**9)+"/100 billion", self.smallfont, [rect[0] + 20, rect[1] + 150]))
+                    costlabel.append(GUI.Label("- Coins: "+str(self.PlayerList[self.player][5]//10**9)+"/100 billion", self.smallfont, [rect[0] + extraw, rect[1] + int(150*self.ratioh)]))
             else:
-                caplabel = GUI.Label("Found your capital", self.medfont, [rect[0] + 20, rect[1] + 20])
-                costlabel = [GUI.Label("Free", self.smallfont, [rect[0] + 20, rect[1] + 90])]
+                caplabel = GUI.Label("Found your capital", self.medfont, [rect[0] + extraw, rect[1] + extrah])
+                costlabel = [GUI.Label("Free", self.smallfont, [rect[0] + extraw, rect[1] + int(90*self.ratioh)])]
 
         caplabel.DrawLabel(self.screen)
         for label in costlabel:
@@ -263,7 +276,7 @@ class AreaScene():
         elif self.capital_check == 0:
             self.area[11][0] = 1
             self.AreaList[self.area[8]][11][0] = 1
-            self.labellist[11] = GUI.Label("- Capital", self.largefont, [1360, 175])
+            self.labellist[11] = GUI.Label("- Capital", self.largefont, [int(1360*self.ratiow), int(175*self.ratioh)])
             self.capital_check = -1
             return
         else:
@@ -289,8 +302,11 @@ class AreaScene():
                 
 
     def BuildingHover(self, building):
+        extraw = int(60*self.ratiow)
+        extrah = int(20*self.ratioh)
+        vert = int(200*self.ratioh)
         if building == "factory":
-            rect = [self.BuildFactory[0], self.BuildFactory[1] + self.BuildFactory[3] + 20, self.BuildFactory[2] + 60, 200]
+            rect = [self.BuildFactory[0], self.BuildFactory[1] + self.BuildFactory[3] + extrah, self.BuildFactory[2] + extraw, vert]
             highestlevel = 4
             metal = 300
             timber = 700
@@ -299,9 +315,9 @@ class AreaScene():
             index = 1
             
         elif building == "port":
-            rect = [self.BuildPort[0], self.BuildPort[1] + self.BuildPort[3] + 20, self.BuildPort[2] + 60, 200]
+            rect = [self.BuildPort[0], self.BuildPort[1] + self.BuildPort[3] + extrah, self.BuildPort[2] + extraw, vert]
             if type(self.area[7][-1]) != list:
-                caplabel = GUI.Label("Cannot build port", self.medfont, [rect[0] + 20, rect[1] + 20])
+                caplabel = GUI.Label("Cannot build port", self.medfont, [rect[0] + extraw//3, rect[1] + extrah])
                 self.screen.fill([50, 50, 50, 50], tuple(rect))
                 pygame.draw.rect(self.screen, [0, 0, 0, 0], tuple(rect), 3)
                 caplabel.DrawLabel(self.screen)
@@ -314,7 +330,7 @@ class AreaScene():
             index = 2
 
         elif building == "airport":
-            rect = [self.BuildAirPort[0], self.BuildAirPort[1] + self.BuildAirPort[3] + 20, self.BuildAirPort[2] + 60, 200]
+            rect = [self.BuildAirPort[0], self.BuildAirPort[1] + self.BuildAirPort[3] + extrah, self.BuildAirPort[2] + extraw, vert]
             highestlevel = 2
             metal = 400
             timber = 1500
@@ -323,7 +339,7 @@ class AreaScene():
             index = 3
 
         elif building == "fort":
-            rect = [self.BuildFort[0], self.BuildFort[1] + self.BuildFort[3] + 20, self.BuildFort[2] + 60, 200]
+            rect = [self.BuildFort[0], self.BuildFort[1] + self.BuildFort[3] + extrah, self.BuildFort[2] + extraw, vert]
             highestlevel = 5
             metal = 200
             timber = 600
@@ -332,7 +348,7 @@ class AreaScene():
             index = 4
 
         elif building == "hospital":
-            rect = [self.BuildHospital[0], self.BuildHospital[1] + self.BuildHospital[3] + 20, self.BuildHospital[2] + 60, 200]
+            rect = [self.BuildHospital[0], self.BuildHospital[1] + self.BuildHospital[3] + extrah, self.BuildHospital[2] + extraw, vert]
             highestlevel = 3
             metal = 200
             timber = 700
@@ -341,7 +357,7 @@ class AreaScene():
             index = 5
 
         elif building == "university":
-            rect = [self.BuildUni[0], self.BuildUni[1] + self.BuildUni[3] + 20, self.BuildUni[2] + 60, 200]
+            rect = [self.BuildUni[0], self.BuildUni[1] + self.BuildUni[3] + extrah, self.BuildUni[2] + extraw, vert]
             highestlevel = 4
             metal = 200
             timber = 700
@@ -350,41 +366,42 @@ class AreaScene():
             index = 6
 
         elif building == "bank":
-            rect = [self.BuildBank[0], self.BuildBank[1] + self.BuildBank[3] + 20, self.BuildBank[2] + 60, 200]
+            rect = [self.BuildBank[0], self.BuildBank[1] + self.BuildBank[3] + extrah, self.BuildBank[2] + extraw, vert]
             highestlevel = 1
             metal = 100
             timber = 500
             energy = 500
             coins = 500
             index = 7
-            
+
+        extraw = int(self.ratiow*20)
         self.screen.fill([50, 50, 50, 50], tuple(rect))
         pygame.draw.rect(self.screen, [0, 0, 0, 0], tuple(rect), 3)
         if self.area[11][index] == highestlevel:
-            caplabel = GUI.Label("Cannot upgrade", self.medfont, [rect[0] + 20, rect[1] + 20])
-            costlabel = [GUI.Label("", self.smallfont, [rect[0] + 20, rect[1] + 50])]
+            caplabel = GUI.Label("Cannot upgrade", self.medfont, [rect[0] + extraw, rect[1] + extrah])
+            costlabel = [GUI.Label("", self.smallfont, [rect[0] + extaw, rect[1] + int(50*self.ratioh)])]
         else:
-            caplabel = GUI.Label("Upgrade "+building, self.medfont, [rect[0] + 20, rect[1] + 20])
+            caplabel = GUI.Label("Upgrade "+building, self.medfont, [rect[0] + extraw, rect[1] + extrah])
             costlabel = []
             if self.PlayerList[self.player][4][0] < metal:
-                costlabel.append(GUI.Label("- Metal: "+str(self.PlayerList[self.player][4][0])+"/"+str(metal), self.smallfont, [rect[0] + 20, rect[1] + 60], color = (255, 0, 0)))
+                costlabel.append(GUI.Label("- Metal: "+str(self.PlayerList[self.player][4][0])+"/"+str(metal), self.smallfont, [rect[0] + extraw, rect[1] + int(60*self.ratioh)], color = (255, 0, 0)))
             else:
-                costlabel.append(GUI.Label("- Metal: "+str(self.PlayerList[self.player][4][0])+"/"+str(metal), self.smallfont, [rect[0] + 20, rect[1] + 60], color = (255, 255, 255)))
+                costlabel.append(GUI.Label("- Metal: "+str(self.PlayerList[self.player][4][0])+"/"+str(metal), self.smallfont, [rect[0] + extraw, rect[1] + int(60*self.ratioh)], color = (255, 255, 255)))
             if self.PlayerList[self.player][4][1] < timber:
-                costlabel.append(GUI.Label("- Timber: "+str(self.PlayerList[self.player][4][1])+"/"+str(timber), self.smallfont, [rect[0] + 20, rect[1] + 90], color = (255, 0, 0)))
+                costlabel.append(GUI.Label("- Timber: "+str(self.PlayerList[self.player][4][1])+"/"+str(timber), self.smallfont, [rect[0] + extraw, rect[1] + int(90*self.ratioh)], color = (255, 0, 0)))
             else:
-                costlabel.append(GUI.Label("- Timber: "+str(self.PlayerList[self.player][4][1])+"/"+str(timber), self.smallfont, [rect[0] + 20, rect[1] + 90], color = (255, 255, 255)))
+                costlabel.append(GUI.Label("- Timber: "+str(self.PlayerList[self.player][4][1])+"/"+str(timber), self.smallfont, [rect[0] + extraw, rect[1] + int(90*self.ratioh)], color = (255, 255, 255)))
                 
             if self.PlayerList[self.player][4][2] + self.PlayerList[self.player][4][3]*20 + self.PlayerList[self.player][4][4]*3 < energy:
                 costlabel.append(GUI.Label("- Energy: "+str(self.PlayerList[self.player][4][2] + self.PlayerList[self.player][4][3]*20 + self.PlayerList[self.player][4][4]*3 )+"/"+str(energy),
-                                       self.smallfont, [rect[0] + 20, rect[1] + 120], color = (255, 0, 0)))
+                                       self.smallfont, [rect[0] + extraw, rect[1] + int(120*self.ratioh)], color = (255, 0, 0)))
             else:
                 costlabel.append(GUI.Label("- Energy: "+str(self.PlayerList[self.player][4][2] + self.PlayerList[self.player][4][3]*20 + self.PlayerList[self.player][4][4]*3 )+"/"+str(energy),
-                                       self.smallfont, [rect[0] + 20, rect[1] + 120], color = (255, 255, 255)))
+                                       self.smallfont, [rect[0] + extraw, rect[1] + int(120*self.ratioh)], color = (255, 255, 255)))
             if self.PlayerList[self.player][5] < coins*10**9:
-                costlabel.append(GUI.Label("- Coins: "+str(self.PlayerList[self.player][5]//10**9)+"/"+str(coins)+" billion", self.smallfont, [rect[0] + 20, rect[1] + 150], color = (255, 0, 0)))
+                costlabel.append(GUI.Label("- Coins: "+str(self.PlayerList[self.player][5]//10**9)+"/"+str(coins)+" billion", self.smallfont, [rect[0] + extraw, rect[1] + int(150*self.ratioh)], color = (255, 0, 0)))
             else:
-                costlabel.append(GUI.Label("- Coins: "+str(self.PlayerList[self.player][5]//10**9)+"/"+str(coins)+" billion", self.smallfont, [rect[0] + 20, rect[1] + 150]))
+                costlabel.append(GUI.Label("- Coins: "+str(self.PlayerList[self.player][5]//10**9)+"/"+str(coins)+" billion", self.smallfont, [rect[0] + extraw, rect[1] + int(150*self.ratioh)]))
 
         caplabel.DrawLabel(self.screen)
         for label in costlabel:
@@ -471,24 +488,27 @@ class AreaScene():
             else: capital = "- Capital"
             if self.area[11][7] == 0: bank = "- No bank"
             else: bank = "- Bank"
-            self.labellist = [GUI.Label(self.area[1], self.hugefont, [int(self.w/2 - len(self.area[1])*19), 20]),
-                          GUI.Label("- Moral: "+str(round(self.area[6]))+"%", self.largefont, [660, 175]),
-                          GUI.Label("- Population: "+str(round(self.area[3], 3))+" million people", self.largefont, [660, 225]),
-                          GUI.Label("- Per Capita Income: "+str(int(self.area[9]))+" coins", self.largefont, [660, 275]),
-                          GUI.Label("- Resources", self.verylargefont, [660, 340]),
-                          GUI.Label("- Food: "+str(int(self.area[4][5][0]))+"/"+str(self.area[4][5][1]), self.largefont, [660, 400]),
-                          GUI.Label("- Metal: "+str(self.area[4][0][0])+"/"+str(self.area[4][0][1]), self.largefont, [660, 450]),
-                          GUI.Label("- Timber: "+str(int(self.area[4][1][0]))+"/"+str(self.area[4][1][1]), self.largefont, [660, 500]),
-                          GUI.Label("- Fossil Fuels: "+str(self.area[4][2][0])+"/"+str(self.area[4][2][1]), self.largefont, [660, 550]),
-                          GUI.Label("- Uranium: "+str(self.area[4][3][0])+"/"+str(self.area[4][3][1]), self.largefont, [660, 600]),
-                          GUI.Label("- Renewables: "+"| "+(self.area[4][4][0] + 1)*"+"+(6 - self.area[4][4][0])*" "+"|", self.largefont, [660, 650]),
-                          GUI.Label(capital, self.largefont, [1360, 175]), Label("- Factory: lvl. "+str(self.area[11][1]), self.largefont, (1360, 260)),
-                          GUI.Label("- Port: lvl. "+str(self.area[11][2]), self.largefont, (1360, 320)),
-                          GUI.Label("- Airport: lvl. "+str(self.area[11][3]), self.largefont, (1360, 380)),
-                          GUI.Label("- Fort: lvl. "+str(self.area[11][4]), self.largefont, (1360, 460)),
-                          GUI.Label("- Hospital: lvl. "+str(self.area[11][5]), self.largefont, (1360, 520)),
-                          GUI.Label("- University: lvl. "+str(self.area[11][6]), self.largefont, (1360, 580)),
-                          GUI.Label(bank, self.largefont, (1360, 660)),]
+            marg1 = int(660*self.ratiow)
+            merg2 = int(1360*self.ratiow)
+            self.labellist = [GUI.Label(self.area[1], self.hugefont, [int(self.w/2 - len(self.area[1])*19), int(20*self.ratioh)]),
+                          GUI.Label("- Moral: "+str(round(self.area[6]))+"%", self.largefont, [marg1, int(175*self.ratioh)]),
+                          GUI.Label("- Population: "+str(round(self.area[3], 3))+" million people", self.largefont, [marg1, int(225*self.ratioh)]),
+                          GUI.Label("- Per Capita Income: "+str(int(self.area[9]))+" coins", self.largefont, [marg1, int(275*self.ratioh)]),
+                          GUI.Label("- Resources", self.verylargefont, [marg1, int(340*self.ratioh)]),
+                          GUI.Label("- Food: "+str(int(self.area[4][5][0]))+"/"+str(self.area[4][5][1]), self.largefont, [marg1, int(400*self.ratioh)]),
+                          GUI.Label("- Metal: "+str(self.area[4][0][0])+"/"+str(self.area[4][0][1]), self.largefont, [marg1, int(450*self.ratioh)]),
+                          GUI.Label("- Timber: "+str(int(self.area[4][1][0]))+"/"+str(self.area[4][1][1]), self.largefont, [marg1, int(500*self.ratioh)]),
+                          GUI.Label("- Fossil Fuels: "+str(self.area[4][2][0])+"/"+str(self.area[4][2][1]), self.largefont, [marg1, int(550*self.ratioh)]),
+                          GUI.Label("- Uranium: "+str(self.area[4][3][0])+"/"+str(self.area[4][3][1]), self.largefont, [marg1, int(600*self.ratioh)]),
+                          GUI.Label("- Renewables: "+"| "+(self.area[4][4][0] + 1)*"+"+(6 - self.area[4][4][0])*" "+"|", self.largefont, [marg1, int(650*self.ratioh)]),
+                          GUI.Label(capital, self.largefont, [marg2, int(175*self.ratioh)]),
+                          GUI.Label("- Factory: lvl. "+str(self.area[11][1]), self.largefont, (marg2, int(260*self.ratioh))),
+                          GUI.Label("- Port: lvl. "+str(self.area[11][2]), self.largefont, (marg2, int(320*self.ratioh))),
+                          GUI.Label("- Airport: lvl. "+str(self.area[11][3]), self.largefont, (marg2, int(380*self.ratioh))),
+                          GUI.Label("- Fort: lvl. "+str(self.area[11][4]), self.largefont, (marg2, int(460*self.ratioh))),
+                          GUI.Label("- Hospital: lvl. "+str(self.area[11][5]), self.largefont, (marg2, int(520*self.ratioh))),
+                          GUI.Label("- University: lvl. "+str(self.area[11][6]), self.largefont, (marg2, int(580*self.ratioh))),
+                          GUI.Label(bank, self.largefont, (marg2, int(660*self.ratioh))),]
 
     def WriteInfo(self):
         f = open("Info.txt", "w")
