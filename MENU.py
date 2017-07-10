@@ -1,5 +1,10 @@
-import ctypes, pygame, sys, os
+import ctypes
+import sys
+import os
+
+import pygame
 from pygame import font
+
 import MAIN1 as MAIN
 import GENERAL as GEN
 

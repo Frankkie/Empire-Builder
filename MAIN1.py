@@ -1,4 +1,11 @@
-import pygame, sys, os, random, datetime, math, ctypes
+import os
+import sys
+import random
+import datetime
+import math
+import ctypes
+
+import pygame
 from pygame import font
 
 import OBJECTS as OBJ
@@ -15,7 +22,7 @@ class MainScene():
         self.h = metrics[1]
         self.ratiow = metrics[2]
         self.ratioh = metrics[3]
-        screen.fill((0, 0, 0))
+        screen.fill((0, 0, 0))  
         if previous == "MenuScene":
             self.InitializeGame()
             check = 1
@@ -38,11 +45,6 @@ class MainScene():
                     self.DrawMap(screen, player, year, self.Clock)
                 check = 1
         
-            
-
-    def SwitchToScene(self, scene):
-        active_scene = scenes[scene]
-
     def InitializeGame(self):
         self.AreaList = self.InitializeAreaList(self.screen, self.NumPlayers)
         num = int(self.NumPlayers)

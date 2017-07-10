@@ -1,5 +1,6 @@
 import pygame
 from pygame import font
+
 import GENERAL as GEN
 
 class Bar():
