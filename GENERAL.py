@@ -11,3 +11,6 @@ def screen_metrics():
     hto1080 = height/1080
     metrics = [width, height, wto1920, hto1080]
     return metrics
+
+
+# Create new load function that bipasses pygame.error
