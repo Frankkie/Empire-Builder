@@ -1,8 +1,11 @@
+""" This module contains general usage functions. """
 import ctypes
 
-'''Finds the width and height of the screen,
-as well as the ratio of the width and height to 1920 and 1080 respectively'''
+
 def screen_metrics():
+    """Finds the width and height of the screen,
+         as well as the ratio of the width and height
+         to 1920 and 1080 respectively"""
     ctypes.windll.user32.SetProcessDPIAware()
     user32 = ctypes.windll.user32
     width = int(user32.GetSystemMetrics(0))
