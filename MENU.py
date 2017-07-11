@@ -22,10 +22,12 @@ class MenuScene():
         self.ratiow = metrics[2]
         self.ratioh = metrics[3]
         background1 = pygame.image.load("half1.png")
-        background1 = pygame.transform.scale(background1, (int(self.w/2 - 300*self.ratiow), self.h))
+        background1 = pygame.transform.scale(background1, (int(self.w/2 - 300*self.ratiow),
+                                                                                                   self.h))
         screen.blit(background1, [0,0])
         background2 = pygame.image.load("half2.png")
-        background2 = pygame.transform.scale(background2, (int(self.w/2 - 300*self.ratiow), self.h))
+        background2 = pygame.transform.scale(background2, (int(self.w/2 - 300*self.ratiow),
+                                                                                                   self.h))
         screen.blit(background2, [int(self.w/2 + 300*self.ratiow),0])
         
         self.NumPlayers = 1
@@ -36,14 +38,23 @@ class MenuScene():
         self.labelselect = self.medfont.render("Select number of players:  ", 1, self.white)
         screen.blit(self.title, (int(self.w/2 - 285*self.ratiow), int(80*self.ratioh)))
         screen.blit(self.labelselect, (int(self.w/2 - 240*self.ratiow), int(300*self.ratioh)))
-        self.button = pygame.Rect((int(self.w/2 + 200*self.ratiow), int(305*self.ratioh), int(50*self.ratiow), int(40*self.ratioh)))
-        self.startbutton = pygame.Rect((int(self.w/2 - 150*self.ratiow), int(440*self.ratioh), int(300*self.ratiow), int(100*self.ratioh)))
-        self.loadbutton = pygame.Rect((int(self.w/2 - 150*self.ratiow), int(640*self.ratioh), int(300*self.ratiow), int(100*self.ratioh)))
+        self.button = pygame.Rect((int(self.w/2 + 200*self.ratiow), int(305*self.ratioh),
+                                                     int(50*self.ratiow), int(40*self.ratioh)))
+        self.startbutton = pygame.Rect((int(self.w/2 - 150*self.ratiow), int(440*self.ratioh),
+                                                             int(300*self.ratiow), int(100*self.ratioh)))
+        self.loadbutton = pygame.Rect((int(self.w/2 - 150*self.ratiow), int(640*self.ratioh),
+                                                             int(300*self.ratiow), int(100*self.ratioh)))
                 
         while 1:
-            self.DrawButton((int(self.w/2 + 200*self.ratiow), int(305*self.ratioh), int(50*self.ratiow), int(40*self.ratioh)), "^", (int(self.w/2 + 215*self.ratiow), int(310*self.ratioh)))
-            self.DrawButton((int(self.w/2 - 150*self.ratiow), int(440*self.ratioh), int(300*self.ratiow), int(100*self.ratioh)), "Start Game", (int(self.w/2 - 90*self.ratiow), int(465*self.ratioh)))
-            self.DrawButton((int(self.w/2 - 150*self.ratiow), int(640*self.ratioh), int(300*self.ratiow), int(100*self.ratioh)), "Load Game", (int(self.w/2 - 90*self.ratiow), int(665*self.ratioh)))
+            self.DrawButton((int(self.w/2 + 200*self.ratiow), int(305*self.ratioh),
+                                          int(50*self.ratiow), int(40*self.ratioh)), "^",
+                                         (int(self.w/2 + 215*self.ratiow), int(310*self.ratioh)))
+            self.DrawButton((int(self.w/2 - 150*self.ratiow), int(440*self.ratioh),
+                                          int(300*self.ratiow), int(100*self.ratioh)), "Start Game",
+                                          (int(self.w/2 - 90*self.ratiow), int(465*self.ratioh)))
+            self.DrawButton((int(self.w/2 - 150*self.ratiow), int(640*self.ratioh),
+                                          int(300*self.ratiow), int(100*self.ratioh)), "Load Game",
+                                         (int(self.w/2 - 90*self.ratiow), int(665*self.ratioh)))
             self.labelnum = self.medfont.render(str(self.NumPlayers), 1, self.white)
             screen.blit(self.labelnum, (int(self.w/2 + 170*self.ratiow), int(300*self.ratioh)))
             mouse_pos = pygame.mouse.get_pos()
@@ -64,19 +75,17 @@ class MenuScene():
                 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.button.collidepoint(mouse_pos):
-                        screen.fill(self.grey, (int(self.w/2 + 170*self.ratiow), int(300*self.ratioh), int(30*self.ratiow), int(50*self.ratioh)))
+                        screen.fill(self.grey, (int(self.w/2 + 170*self.ratiow), int(300*self.ratioh),
+                                                           int(30*self.ratiow), int(50*self.ratioh)))
                         self.NumPlayers += 1
                         self.NumPlayers = self.NumPlayers%6
                         if self.NumPlayers == 0:
                             self.NumPlayers = 6
                     if self.startbutton.collidepoint(mouse_pos):
-                        self.SwitchToScene(MAIN.MainScene(screen, self.NumPlayers, "MenuScene", 180.9, 0))
-            
-
+                        active_scene = MAIN.MainScene(screen, self.NumPlayers, "MenuScene",
+                                                                                180.9, 0)
             pygame.display.flip()
 
-    def SwitchToScene(self, scene):
-        active_scene = scenes[scene]
 
     def DrawButton(self, rect, text, textloc):
         label = self.medfont.render(text, 1, self.white)

@@ -53,17 +53,33 @@ class Area():
         if self.country[0] == "p": player = "Player "+self.country[1]
         if self.country == "o": player = "Unclaimed waters"
         marg = int(10*self.ratiow)
-        self.LabelList = [GUI.Label(self.name+capital, self.myfont, (rect[0] + marg, rect[1] + int(5*self.ratioh))),
-                          GUI.Label(player, self.medfont, (rect[0] + marg, rect[1] +int( 38*self.ratioh))),
-                          GUI.Label("Population: "+str(self.population/1000000)[:5]+" million", self.mysmallfont, (rect[0] + marg, rect[1] + int(74*self.ratioh))),
-                          GUI.Label("Moral: "+str(int(self.moral))+"%", self.mysmallfont, (rect[0] + marg, rect[1] + int(96*self.ratioh))),
-                          GUI.Label("Food: "+str(int(self.resources[5][0])), self.mysmallfont, (rect[0] + marg, rect[1] + int(118*self.ratioh))),
-                          GUI.Label("Metal: "+str(int(self.resources[0][0])), self.mysmallfont, (rect[0] + marg, rect[1] + int(140*self.ratioh))),
-                          GUI.Label("Timber: "+str(int(self.resources[1][0])), self.mysmallfont, (rect[0] + marg, rect[1] + int(162*self.ratioh))),
-                          GUI.Label("Fossil fuels: "+str(int(self.resources[2][0])), self.mysmallfont, (rect[0] + marg, rect[1] + int(184*self.ratioh))),
-                          GUI.Label("Uranium: "+str(int(self.resources[3][0])), self.mysmallfont, (rect[0] + marg, rect[1] + int(206*self.ratioh))),
-                          GUI.Label("Renewables: "+(self.resources[4][0]+1)*"#", self.mysmallfont, (rect[0] + marg, rect[1] + int(228*self.ratioh))),
-                          GUI.Label("Income: "+str(int(self.income_capita)), self.mysmallfont, (rect[0] + marg, rect[1] + int(250*self.ratioh)))]
+        self.LabelList = [GUI.Label(self.name+capital, self.myfont, (rect[0] + marg,
+                                                     rect[1] + int(5*self.ratioh))),
+                                    GUI.Label(player, self.medfont, (rect[0] + marg, rect[1]
+                                                                                          + int( 38*self.ratioh))),
+                                    GUI.Label("Population: "+str(self.population/1000000)[:5]
+                                                       + " million", self.mysmallfont,
+                                                       (rect[0] + marg, rect[1] + int(74*self.ratioh))),
+                                    GUI.Label("Moral: "+str(int(self.moral))+"%", self.mysmallfont,
+                                                      (rect[0] + marg, rect[1] + int(96*self.ratioh))),
+                                    GUI.Label("Food: "+str(int(self.resources[5][0])), self.mysmallfont,
+                                                       (rect[0] + marg, rect[1] + int(118*self.ratioh))),
+                                    GUI.Label("Metal: "+str(int(self.resources[0][0])), self.mysmallfont,
+                                                      (rect[0] + marg, rect[1] + int(140*self.ratioh))),
+                                    GUI.Label("Timber: "+str(int(self.resources[1][0])),
+                                                      self.mysmallfont,
+                                                      (rect[0] + marg, rect[1] + int(162*self.ratioh))),
+                                    GUI.Label("Fossil fuels: "+str(int(self.resources[2][0])),
+                                                       self.mysmallfont,
+                                                       (rect[0] + marg, rect[1] + int(184*self.ratioh))),
+                                    GUI.Label("Uranium: "+str(int(self.resources[3][0])),
+                                                     self.mysmallfont,
+                                                      (rect[0] + marg, rect[1] + int(206*self.ratioh))),
+                                    GUI.Label("Renewables: "+(self.resources[4][0]+1)*"#",
+                                                      self.mysmallfont,
+                                                      (rect[0] + marg, rect[1] + int(228*self.ratioh))),
+                                    GUI.Label("Income: "+str(int(self.income_capita)), self.mysmallfont,
+                                                      (rect[0] + marg, rect[1] + int(250*self.ratioh)))]
 
     def draw_area(self, screen):
         screen.blit(self.area_point, self.location)
@@ -146,7 +162,7 @@ class Troop():
         screen.blit(label9, (rect[0] + marg//2, rect[1] + int(205*self.ratioh)))
         screen.blit(label10, (rect[0] + marg//2, rect[1] + int(230*self.ratioh)))
           
-class Troop_Display():
+class TroopDisplay():
     pass       
 
 class Player():
@@ -177,15 +193,22 @@ class Player():
         screen.blit(label, (rect[0] + marg, rect[1] + marg))
         self.area_point = pygame.image.load(self.name+".png")
         screen.blit(self.area_point, [int(220*self.ratiow), int(515*self.ratioh)])
-        label2 = self.mysmallfont.render("Coins: "+str(int(self.coins/1000000)/1000)+" billion", 1, (255, 255, 255))
-        label3 = self.mysmallfont.render("Population: "+str(self.population)[:7]+" million", 1, (255, 255, 255))
+        label2 = self.mysmallfont.render("Coins: "+str(int(self.coins/1000000)/1000)
+                                                                                      +" billion", 1, (255, 255, 255))
+        label3 = self.mysmallfont.render("Population: "+str(self.population)[:7]+
+                                                               " million", 1, (255, 255, 255))
         label4 = self.mysmallfont.render("Metal: "+str(self.resources[0]), 1, (255, 255, 255))
         label5 = self.mysmallfont.render("Timber: "+str(self.resources[1]), 1, (255, 255, 255))
-        label6 = self.mysmallfont.render("Fossil Fuels: "+str(self.resources[2]), 1, (255, 255, 255))
-        label7 = self.mysmallfont.render("Uranium: "+str(self.resources[3]), 1, (255, 255, 255))
-        label8 = self.mysmallfont.render("Renewables: "+str(self.resources[4]), 1, (255, 255, 255))
-        label9 = self.mysmallfont.render("Food: "+str(self.resources[5])[:8], 1, (255, 255, 255))
-        label10 = self.mysmallfont.render("Total Energy: "+str(self.total_energy), 1, (255, 255, 255))
+        label6 = self.mysmallfont.render("Fossil Fuels: "+str(self.resources[2]), 1,
+                                                              (255, 255, 255))
+        label7 = self.mysmallfont.render("Uranium: "+str(self.resources[3]), 1,
+                                                              (255, 255, 255))
+        label8 = self.mysmallfont.render("Renewables: "+str(self.resources[4]), 1,
+                                                               (255, 255, 255))
+        label9 = self.mysmallfont.render("Food: "+str(self.resources[5])[:8], 1,
+                                                               (255, 255, 255))
+        label10 = self.mysmallfont.render("Total Energy: "+str(self.total_energy), 1,
+                                                                (255, 255, 255))
         
         screen.blit(label2, (rect[0] + marg, rect[1] + int(60*self.ratioh)))
         screen.blit(label3, (rect[0] + marg, rect[1] + int(80*self.ratioh)))
@@ -197,19 +220,27 @@ class Player():
         screen.blit(label9, (rect[0] + marg, rect[1] + int(200*self.ratioh)))
         screen.blit(label10, (rect[0] + marg, rect[1] + int(220*self.ratioh)))
        
-        pygame.draw.rect(screen, [255, 255, 255, 255], (int(50*self.ratiow), int(770*self.ratioh), int(180*self.ratiow), int(80*self.ratioh)), 3)
-        self.button1 = pygame.Rect(int(50*self.ratiow), int(770*self.ratioh), int(180*self.ratiow), int(80*self.ratioh))
+        pygame.draw.rect(screen, [255, 255, 255, 255], (int(50*self.ratiow),
+                                                                                         int(770*self.ratioh),
+                                        int(180*self.ratiow), int(80*self.ratioh)), 3)
+        self.button1 = pygame.Rect(int(50*self.ratiow), int(770*self.ratioh),
+                                                       int(180*self.ratiow), int(80*self.ratioh))
         label11 = self.myfont.render("Next Player", 1, (255, 255, 255))
         screen.blit(label11, (int(70*self.ratiow), int(790*self.ratioh)))
 
-        pygame.draw.rect(screen, [255, 255, 255, 255], (int(50*self.ratiow), int(880*self.ratioh), int(180*self.ratiow), int(80*self.ratioh)), 3)
-        self.button2 = pygame.Rect(int(50*self.ratiow), int(880*self.ratioh), int(180*self.ratiow), int(80*self.ratioh))
+        pygame.draw.rect(screen, [255, 255, 255, 255], (int(50*self.ratiow),
+                                      int(880*self.ratioh), int(180*self.ratiow), int(80*self.ratioh)), 3)
+        self.button2 = pygame.Rect(int(50*self.ratiow), int(880*self.ratioh),
+                                                       int(180*self.ratiow), int(80*self.ratioh))
         label12 = self.myfont.render("Save & quit", 1, (255, 255, 255))
         screen.blit(label12, (int(66*self.ratiow), int(902*self.ratioh)))
 
-        pygame.draw.rect(screen, [255, 255, 255, 255], (int(1490*self.ratiow), int(10*self.ratioh), int(150*self.ratiow), int(50*self.ratioh)), 3)
-        self.button3 = pygame.Rect(int(1490*self.ratiow), int(10*self.ratioh), int(150*self.ratiow), int(50*self.ratioh))
-        screen.fill([50, 50, 50], (int(1490*self.ratiow), int(10*self.ratioh), int(150*self.ratiow), int(50*self.ratioh)))
+        pygame.draw.rect(screen, [255, 255, 255, 255], (int(1490*self.ratiow),
+                                      int(10*self.ratioh), int(150*self.ratiow), int(50*self.ratioh)), 3)
+        self.button3 = pygame.Rect(int(1490*self.ratiow), int(10*self.ratioh),
+                                                       int(150*self.ratiow), int(50*self.ratioh))
+        screen.fill([50, 50, 50], (int(1490*self.ratiow), int(10*self.ratioh),
+                                                 int(150*self.ratiow), int(50*self.ratioh)))
 
         if pause: label13 = self.myfont.render("Play", 1, (255, 255, 255))
         if not pause: label13 = self.myfont.render("Pause", 1, (255, 255, 255))
