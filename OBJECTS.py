@@ -1,11 +1,21 @@
+""" This module contains basic classes like Area, Player, Troop and
+      TroopDisplay (the last one is pending). """
+
 import pygame
 from pygame import font
 
 import GUI
 import GENERAL as GEN
 
+
+
 class Area():
+    """ The class whose objects are areas of the game.
+           Contains the draw_area and hover_display methods. """
     def __init__(self, arealist):
+        """ (arealist)
+              Initializes variables an the labels used by the hover_display
+              method. """
         screen = arealist[0]
         self.name = arealist[1]
         self.location = arealist[2]
@@ -14,36 +24,36 @@ class Area():
         self.country = arealist[5]
         self.moral = arealist[6]
         self.neighbors = arealist[7]
+        self.index = arealist[8]
         self.income_capita = arealist[9]
         self.tax = arealist[10]
         self.buildings = arealist[11]
+        
         metrics = GEN.screen_metrics()
         self.w = metrics[0]
         self.h = metrics[1]
+        w = self.w
+        h = self.h
         self.ratiow = metrics[2]
         self.ratioh = metrics[3]
-        if type(self.neighbors) == list: self.sea = True
-        if type(self.neighbors) == int: self.sea = False
-        self.index = arealist[8]
-
-        self.area_point = pygame.image.load(self.country+".png")
         
+        self.area_point = pygame.image.load(self.country+".png")
+
+        # Adjust this button's size to screen size.                                     #############################################################################
         self.button = pygame.Rect(self.location[0], self.location[1], 20, 20)
+        
         self.myfont = pygame.font.SysFont("times", int(30*self.ratiow))
         self.medfont = pygame.font.SysFont("times", int(22*self.ratiow))
         self.mysmallfont = pygame.font.SysFont("times", int(18*self.ratiow))
-        
 
+        # Chage this bit in a way it calculates the size of the rect based on the size  #####################################################################
+        # Create GENERAL module function calc_rect_size() that calculates a rect's size, based on the labels in it.
         size = int(225*self.ratiow)
         if len(self.name) > 11:
             size = int(17.5*len(self.name)*self.ratiow)
-
-        w = self.w
-        h = self.h
         self.ratio = 285/size*self.ratioh
         rect = [self.location[0] + 20, self.location[1] + 20, size, int(size*self.ratio)]
         self.rect = rect
-
         if rect[0] + rect[2] > w - 100: rect[0] = self.location[0] - 20 - size
         if rect[1] + rect[3] > h - 100: rect[1] = self.location[1] - 20 - int(size*self.ratio)
         
