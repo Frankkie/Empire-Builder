@@ -16,6 +16,7 @@ class Area():
         """ (arealist)
               Initializes variables an the labels used by the hover_display
               method. """
+        # Variable initialization.
         screen = arealist[0]
         self.name = arealist[1]
         self.location = arealist[2]
@@ -28,7 +29,8 @@ class Area():
         self.income_capita = arealist[9]
         self.tax = arealist[10]
         self.buildings = arealist[11]
-        
+
+        # Getting screen metrics.
         metrics = GEN.screen_metrics()
         self.w = metrics[0]
         self.h = metrics[1]
@@ -48,6 +50,7 @@ class Area():
 
         # Chage this bit in a way it calculates the size of the rect based on the size  #####################################################################
         # Create GENERAL module function calc_rect_size() that calculates a rect's size, based on the labels in it.
+        # Add this part to hover_display method
         size = int(225*self.ratiow)
         if len(self.name) > 11:
             size = int(17.5*len(self.name)*self.ratiow)
@@ -56,7 +59,8 @@ class Area():
         self.rect = rect
         if rect[0] + rect[2] > w - 100: rect[0] = self.location[0] - 20 - size
         if rect[1] + rect[3] > h - 100: rect[1] = self.location[1] - 20 - int(size*self.ratio)
-        
+
+        # Label initialization.
         if self.buildings[0]: capital = "***"
         else: capital = ""
         if self.country == "c": player = "Computer"
@@ -91,18 +95,33 @@ class Area():
                                     GUI.Label("Income: "+str(int(self.income_capita)), self.mysmallfont,
                                                       (rect[0] + marg, rect[1] + int(250*self.ratioh)))]
 
+
     def draw_area(self, screen):
+        """ (screen)
+             This method blits the right area_point on the map. """
         screen.blit(self.area_point, self.location)
+
         
     def hover_display(self, screen, rect):
+        """ (screen, rect)
+             This method is called when the cursor hovers over
+             the area_point. """
         screen.fill([50, 50, 50, 50], tuple(rect))
         pygame.draw.rect(screen, [0, 0, 0, 0], tuple(rect), 3)
 
         for label in self.LabelList:
             label.DrawLabel(screen)
 
+
+########################################################
+
+
 class Troop():
+    """ This is the class whose objects are battalions in the game. """
     def __init__(self, trooplist, loc):
+        """ (trooplist, loc)
+              Initializes variables, loads troop_point image. """
+        # Variable initialization.
         screen = trooplist[0]
         self.index = trooplist[1]
         self.name = trooplist[2]
@@ -111,22 +130,32 @@ class Troop():
         self.units = trooplist[5]
         self.moral = trooplist[6]
         self.location = [loc[0], loc[1] + 20]
+        self.click = False
+        
         self.troop_point = pygame.image.load(self.player+"troop.png")
+        
         metrics = GEN.screen_metrics()
         self.w = metrics[0]
         self.h = metrics[1]
         self.ratiow = metrics[2]
         self.ratioh = metrics[3]
+        
         self.button = pygame.Rect(self.location[0], self.location[1], 20, 20)
-        self.fi = 31/50
+
         self.myfont = pygame.font.SysFont("times", int(28*self.ratiow))
         self.mysmallfont = pygame.font.SysFont("times", int(18*self.ratiow))
-        self.click = False
+        
 
     def draw_troop(self, screen):
+        """ (screen)
+              This method blits the troop_point image on the map. """
         screen.blit(self.troop_point, self.location)
 
+
     def hover_display(self, screen):
+        """ (screen)
+             This method is called when the cursor hovers over
+             the troop_point image. """
         size = int(200*self.ratiow)
         if len(self.name) == 4: size = int(215*self.ratiow)
         if len(self.name) == 5: size = int(230*self.ratiow)
@@ -171,12 +200,26 @@ class Troop():
         screen.blit(label8, (rect[0] + marg//2, rect[1] + int(185*self.ratioh)))
         screen.blit(label9, (rect[0] + marg//2, rect[1] + int(205*self.ratioh)))
         screen.blit(label10, (rect[0] + marg//2, rect[1] + int(230*self.ratioh)))
-          
+
+
+###########################################################
+
+
 class TroopDisplay():
     pass       
 
+
+###########################################################
+
+
+
 class Player():
+    """ This class controls the display of the player statistics
+          on the screen. """
     def __init__(self, playerlist, pause):
+        """ (playerlist, pause)
+              Controls all the aspects of the class. """ ################## Create seperate Draw method to be called to draw the player display info #########
+        # Variables initialization.
         screen = playerlist[0]
         self.index = playerlist[1]
         self.name = playerlist[2]
@@ -186,19 +229,25 @@ class Player():
         self.population = playerlist[6]
         self.troops = playerlist[7]
         self.total_energy = self.resources[2] + self.resources[3]*20 + self.resources[4]*3
+
+        # Getting screen metrics
         metrics = GEN.screen_metrics()
         self.w = metrics[0]
         self.h = metrics[1]
         self.ratiow = metrics[2]
         self.ratioh = metrics[3]
+
+        self.myfont = pygame.font.SysFont("times", int(30*self.ratiow))
+        self.mysmallfont = pygame.font.SysFont("times", int(18*self.ratiow))
+        
+        # Player info display. ################# labels through Label class objects
         marg = int(15*self.ratiow)
         rect = [0, int(500*self.ratioh), int(260*self.ratiow), int(500*self.ratioh)]
         screen.fill([50, 50, 50, 50], tuple(rect))
         pygame.draw.rect(screen, [255, 255, 255, 255], tuple(rect), 3)
         if self.name[0] == "p": self.full_name = "Player "+self.name[1]
         if self.name[0] == "c": self.full_name = "Computer"
-        self.myfont = pygame.font.SysFont("times", int(30*self.ratiow))
-        self.mysmallfont = pygame.font.SysFont("times", int(18*self.ratiow))
+        
         label = self.myfont.render(self.full_name, 1, (255, 255, 255))
         screen.blit(label, (rect[0] + marg, rect[1] + marg))
         self.area_point = pygame.image.load(self.name+".png")
