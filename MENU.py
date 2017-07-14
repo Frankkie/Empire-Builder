@@ -17,17 +17,20 @@ class MenuScene():
         """ (screen)
               Initializes variables, loads images, creates fonts,
               buttons. """
+        # Variable initialization.
         self.screen = screen
         self.black = (0, 0, 0)
         self.grey = (40, 40, 40)
         self.white = (255, 255, 255)
-        
+
+        # Getting screen metrics.
         metrics = GEN.screen_metrics()
         self.w = metrics[0]
         self.h = metrics[1]
         self.ratiow = metrics[2]
         self.ratioh = metrics[3]
-        
+
+        # Images loading.
         self.background1 = pygame.image.load("half1.png")
         self.background1 = pygame.transform.scale(self.background1, (int(self.w/2 - 300*self.ratiow),
                                                                                                    self.h))
@@ -35,16 +38,18 @@ class MenuScene():
         self.background2 = pygame.transform.scale(self.background2, (int(self.w/2 - 300*self.ratiow),
                                                                                                    self.h))
 
+        # Labels and fonts. ###################### Change the labels with Label class objects #####################
         self.largefont = pygame.font.SysFont("times", int(75*self.ratiow))
         self.medfont = pygame.font.SysFont("times", int(40*self.ratiow))
         self.smallfont = pygame.font.SysFont("times", int(20*self.ratiow))
         self.title = self.largefont.render("Empire Builder 0.3", 1, self.white)
-        
         self.NumPlayers = 1
         self.labelselect = self.medfont.render("Select number of players:  ", 1, self.white)
+
+
+        # Buttons.
         self.button = pygame.Rect((int(self.w/2 + 200*self.ratiow), int(305*self.ratioh),
                                                      int(50*self.ratiow), int(40*self.ratioh)))
-        
         self.startbutton = pygame.Rect((int(self.w/2 - 150*self.ratiow), int(440*self.ratioh),
                                                              int(300*self.ratiow), int(100*self.ratioh)))
         self.loadbutton = pygame.Rect((int(self.w/2 - 150*self.ratiow), int(640*self.ratioh),
@@ -57,11 +62,18 @@ class MenuScene():
         """ (screen)
               Draws the Menu, handles events. """
         while 1:
+            # Blitting images on screen.
             screen.fill(self.grey)
             screen.blit(self.background1, [0,0])
             screen.blit(self.background2, [int(self.w/2 + 300*self.ratiow),0])
+
+            # Blitting labels on screen.
             screen.blit(self.title, (int(self.w/2 - 285*self.ratiow), int(80*self.ratioh)))
             screen.blit(self.labelselect, (int(self.w/2 - 240*self.ratiow), int(300*self.ratioh)))
+            self.labelnum = self.medfont.render(str(self.NumPlayers), 1, self.white)
+            screen.blit(self.labelnum, (int(self.w/2 + 170*self.ratiow), int(300*self.ratioh)))
+
+            # Drawing buttons.
             self.DrawButton((int(self.w/2 + 200*self.ratiow), int(305*self.ratioh),
                                           int(50*self.ratiow), int(40*self.ratioh)), "^",
                                          (int(self.w/2 + 215*self.ratiow), int(310*self.ratioh)))
@@ -71,8 +83,8 @@ class MenuScene():
             self.DrawButton((int(self.w/2 - 150*self.ratiow), int(640*self.ratioh),
                                           int(300*self.ratiow), int(100*self.ratioh)), "Load Game",
                                          (int(self.w/2 - 90*self.ratiow), int(665*self.ratioh)))
-            self.labelnum = self.medfont.render(str(self.NumPlayers), 1, self.white)
-            screen.blit(self.labelnum, (int(self.w/2 + 170*self.ratiow), int(300*self.ratioh)))
+
+            # Event handling.
             mouse_pos = pygame.mouse.get_pos()
             if self.button.collidepoint(mouse_pos):
                 pygame.draw.rect(screen, self.white, self.button, 1)
