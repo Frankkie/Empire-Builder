@@ -1,11 +1,22 @@
+""" This module contains basic classes like Area, Player, Troop and
+      TroopDisplay (the last one is pending). """
+
 import pygame
 from pygame import font
 
 import GUI
 import GENERAL as GEN
 
+
+
 class Area():
+    """ The class whose objects are areas of the game.
+           Contains the draw_area and hover_display methods. """
     def __init__(self, arealist):
+        """ (arealist)
+              Initializes variables an the labels used by the hover_display
+              method. """
+        # Variable initialization.
         screen = arealist[0]
         self.name = arealist[1]
         self.location = arealist[2]
@@ -14,69 +25,103 @@ class Area():
         self.country = arealist[5]
         self.moral = arealist[6]
         self.neighbors = arealist[7]
+        self.index = arealist[8]
         self.income_capita = arealist[9]
         self.tax = arealist[10]
         self.buildings = arealist[11]
+
+        # Getting screen metrics.
         metrics = GEN.screen_metrics()
         self.w = metrics[0]
         self.h = metrics[1]
+        w = self.w
+        h = self.h
         self.ratiow = metrics[2]
         self.ratioh = metrics[3]
-        if type(self.neighbors) == list: self.sea = True
-        if type(self.neighbors) == int: self.sea = False
-        self.index = arealist[8]
-
-        self.area_point = pygame.image.load(self.country+".png")
         
+        self.area_point = pygame.image.load(self.country+".png")
+
+        # Adjust this button's size to screen size.                                     #############################################################################
         self.button = pygame.Rect(self.location[0], self.location[1], 20, 20)
+        
         self.myfont = pygame.font.SysFont("times", int(30*self.ratiow))
         self.medfont = pygame.font.SysFont("times", int(22*self.ratiow))
         self.mysmallfont = pygame.font.SysFont("times", int(18*self.ratiow))
-        
 
+        # Chage this bit in a way it calculates the size of the rect based on the size  #####################################################################
+        # Create GENERAL module function calc_rect_size() that calculates a rect's size, based on the labels in it.
+        # Add this part to hover_display method
         size = int(225*self.ratiow)
         if len(self.name) > 11:
             size = int(17.5*len(self.name)*self.ratiow)
-
-        w = self.w
-        h = self.h
         self.ratio = 285/size*self.ratioh
         rect = [self.location[0] + 20, self.location[1] + 20, size, int(size*self.ratio)]
         self.rect = rect
-
         if rect[0] + rect[2] > w - 100: rect[0] = self.location[0] - 20 - size
         if rect[1] + rect[3] > h - 100: rect[1] = self.location[1] - 20 - int(size*self.ratio)
-        
+
+        # Label initialization.
         if self.buildings[0]: capital = "***"
         else: capital = ""
         if self.country == "c": player = "Computer"
         if self.country[0] == "p": player = "Player "+self.country[1]
         if self.country == "o": player = "Unclaimed waters"
         marg = int(10*self.ratiow)
-        self.LabelList = [GUI.Label(self.name+capital, self.myfont, (rect[0] + marg, rect[1] + int(5*self.ratioh))),
-                          GUI.Label(player, self.medfont, (rect[0] + marg, rect[1] +int( 38*self.ratioh))),
-                          GUI.Label("Population: "+str(self.population/1000000)[:5]+" million", self.mysmallfont, (rect[0] + marg, rect[1] + int(74*self.ratioh))),
-                          GUI.Label("Moral: "+str(int(self.moral))+"%", self.mysmallfont, (rect[0] + marg, rect[1] + int(96*self.ratioh))),
-                          GUI.Label("Food: "+str(int(self.resources[5][0])), self.mysmallfont, (rect[0] + marg, rect[1] + int(118*self.ratioh))),
-                          GUI.Label("Metal: "+str(int(self.resources[0][0])), self.mysmallfont, (rect[0] + marg, rect[1] + int(140*self.ratioh))),
-                          GUI.Label("Timber: "+str(int(self.resources[1][0])), self.mysmallfont, (rect[0] + marg, rect[1] + int(162*self.ratioh))),
-                          GUI.Label("Fossil fuels: "+str(int(self.resources[2][0])), self.mysmallfont, (rect[0] + marg, rect[1] + int(184*self.ratioh))),
-                          GUI.Label("Uranium: "+str(int(self.resources[3][0])), self.mysmallfont, (rect[0] + marg, rect[1] + int(206*self.ratioh))),
-                          GUI.Label("Renewables: "+(self.resources[4][0]+1)*"#", self.mysmallfont, (rect[0] + marg, rect[1] + int(228*self.ratioh))),
-                          GUI.Label("Income: "+str(int(self.income_capita)), self.mysmallfont, (rect[0] + marg, rect[1] + int(250*self.ratioh)))]
+        self.LabelList = [GUI.Label(self.name+capital, self.myfont, (rect[0] + marg,
+                                                     rect[1] + int(5*self.ratioh))),
+                                    GUI.Label(player, self.medfont, (rect[0] + marg, rect[1]
+                                                                                          + int( 38*self.ratioh))),
+                                    GUI.Label("Population: "+str(self.population/1000000)[:5]
+                                                       + " million", self.mysmallfont,
+                                                       (rect[0] + marg, rect[1] + int(74*self.ratioh))),
+                                    GUI.Label("Moral: "+str(int(self.moral))+"%", self.mysmallfont,
+                                                      (rect[0] + marg, rect[1] + int(96*self.ratioh))),
+                                    GUI.Label("Food: "+str(int(self.resources[5][0])), self.mysmallfont,
+                                                       (rect[0] + marg, rect[1] + int(118*self.ratioh))),
+                                    GUI.Label("Metal: "+str(int(self.resources[0][0])), self.mysmallfont,
+                                                      (rect[0] + marg, rect[1] + int(140*self.ratioh))),
+                                    GUI.Label("Timber: "+str(int(self.resources[1][0])),
+                                                      self.mysmallfont,
+                                                      (rect[0] + marg, rect[1] + int(162*self.ratioh))),
+                                    GUI.Label("Fossil fuels: "+str(int(self.resources[2][0])),
+                                                       self.mysmallfont,
+                                                       (rect[0] + marg, rect[1] + int(184*self.ratioh))),
+                                    GUI.Label("Uranium: "+str(int(self.resources[3][0])),
+                                                     self.mysmallfont,
+                                                      (rect[0] + marg, rect[1] + int(206*self.ratioh))),
+                                    GUI.Label("Renewables: "+(self.resources[4][0]+1)*"#",
+                                                      self.mysmallfont,
+                                                      (rect[0] + marg, rect[1] + int(228*self.ratioh))),
+                                    GUI.Label("Income: "+str(int(self.income_capita)), self.mysmallfont,
+                                                      (rect[0] + marg, rect[1] + int(250*self.ratioh)))]
+
 
     def draw_area(self, screen):
+        """ (screen)
+             This method blits the right area_point on the map. """
         screen.blit(self.area_point, self.location)
+
         
     def hover_display(self, screen, rect):
+        """ (screen, rect)
+             This method is called when the cursor hovers over
+             the area_point. """
         screen.fill([50, 50, 50, 50], tuple(rect))
         pygame.draw.rect(screen, [0, 0, 0, 0], tuple(rect), 3)
 
         for label in self.LabelList:
             label.DrawLabel(screen)
 
+
+########################################################
+
+
 class Troop():
+    """ This is the class whose objects are battalions in the game. """
     def __init__(self, trooplist, loc):
+        """ (trooplist, loc)
+              Initializes variables, loads troop_point image. """
+        # Variable initialization.
         screen = trooplist[0]
         self.index = trooplist[1]
         self.name = trooplist[2]
@@ -85,22 +130,32 @@ class Troop():
         self.units = trooplist[5]
         self.moral = trooplist[6]
         self.location = [loc[0], loc[1] + 20]
+        self.click = False
+        
         self.troop_point = pygame.image.load(self.player+"troop.png")
+        
         metrics = GEN.screen_metrics()
         self.w = metrics[0]
         self.h = metrics[1]
         self.ratiow = metrics[2]
         self.ratioh = metrics[3]
+        
         self.button = pygame.Rect(self.location[0], self.location[1], 20, 20)
-        self.fi = 31/50
+
         self.myfont = pygame.font.SysFont("times", int(28*self.ratiow))
         self.mysmallfont = pygame.font.SysFont("times", int(18*self.ratiow))
-        self.click = False
+        
 
     def draw_troop(self, screen):
+        """ (screen)
+              This method blits the troop_point image on the map. """
         screen.blit(self.troop_point, self.location)
 
+
     def hover_display(self, screen):
+        """ (screen)
+             This method is called when the cursor hovers over
+             the troop_point image. """
         size = int(200*self.ratiow)
         if len(self.name) == 4: size = int(215*self.ratiow)
         if len(self.name) == 5: size = int(230*self.ratiow)
@@ -145,12 +200,26 @@ class Troop():
         screen.blit(label8, (rect[0] + marg//2, rect[1] + int(185*self.ratioh)))
         screen.blit(label9, (rect[0] + marg//2, rect[1] + int(205*self.ratioh)))
         screen.blit(label10, (rect[0] + marg//2, rect[1] + int(230*self.ratioh)))
-          
-class Troop_Display():
+
+
+###########################################################
+
+
+class TroopDisplay():
     pass       
 
+
+###########################################################
+
+
+
 class Player():
+    """ This class controls the display of the player statistics
+          on the screen. """
     def __init__(self, playerlist, pause):
+        """ (playerlist, pause)
+              Controls all the aspects of the class. """ ################## Create seperate Draw method to be called to draw the player display info #########
+        # Variables initialization.
         screen = playerlist[0]
         self.index = playerlist[1]
         self.name = playerlist[2]
@@ -160,32 +229,45 @@ class Player():
         self.population = playerlist[6]
         self.troops = playerlist[7]
         self.total_energy = self.resources[2] + self.resources[3]*20 + self.resources[4]*3
+
+        # Getting screen metrics
         metrics = GEN.screen_metrics()
         self.w = metrics[0]
         self.h = metrics[1]
         self.ratiow = metrics[2]
         self.ratioh = metrics[3]
+
+        self.myfont = pygame.font.SysFont("times", int(30*self.ratiow))
+        self.mysmallfont = pygame.font.SysFont("times", int(18*self.ratiow))
+        
+        # Player info display. ################# labels through Label class objects
         marg = int(15*self.ratiow)
         rect = [0, int(500*self.ratioh), int(260*self.ratiow), int(500*self.ratioh)]
         screen.fill([50, 50, 50, 50], tuple(rect))
         pygame.draw.rect(screen, [255, 255, 255, 255], tuple(rect), 3)
         if self.name[0] == "p": self.full_name = "Player "+self.name[1]
         if self.name[0] == "c": self.full_name = "Computer"
-        self.myfont = pygame.font.SysFont("times", int(30*self.ratiow))
-        self.mysmallfont = pygame.font.SysFont("times", int(18*self.ratiow))
+        
         label = self.myfont.render(self.full_name, 1, (255, 255, 255))
         screen.blit(label, (rect[0] + marg, rect[1] + marg))
         self.area_point = pygame.image.load(self.name+".png")
         screen.blit(self.area_point, [int(220*self.ratiow), int(515*self.ratioh)])
-        label2 = self.mysmallfont.render("Coins: "+str(int(self.coins/1000000)/1000)+" billion", 1, (255, 255, 255))
-        label3 = self.mysmallfont.render("Population: "+str(self.population)[:7]+" million", 1, (255, 255, 255))
+        label2 = self.mysmallfont.render("Coins: "+str(int(self.coins/1000000)/1000)
+                                                                                      +" billion", 1, (255, 255, 255))
+        label3 = self.mysmallfont.render("Population: "+str(self.population)[:7]+
+                                                               " million", 1, (255, 255, 255))
         label4 = self.mysmallfont.render("Metal: "+str(self.resources[0]), 1, (255, 255, 255))
         label5 = self.mysmallfont.render("Timber: "+str(self.resources[1]), 1, (255, 255, 255))
-        label6 = self.mysmallfont.render("Fossil Fuels: "+str(self.resources[2]), 1, (255, 255, 255))
-        label7 = self.mysmallfont.render("Uranium: "+str(self.resources[3]), 1, (255, 255, 255))
-        label8 = self.mysmallfont.render("Renewables: "+str(self.resources[4]), 1, (255, 255, 255))
-        label9 = self.mysmallfont.render("Food: "+str(self.resources[5])[:8], 1, (255, 255, 255))
-        label10 = self.mysmallfont.render("Total Energy: "+str(self.total_energy), 1, (255, 255, 255))
+        label6 = self.mysmallfont.render("Fossil Fuels: "+str(self.resources[2]), 1,
+                                                              (255, 255, 255))
+        label7 = self.mysmallfont.render("Uranium: "+str(self.resources[3]), 1,
+                                                              (255, 255, 255))
+        label8 = self.mysmallfont.render("Renewables: "+str(self.resources[4]), 1,
+                                                               (255, 255, 255))
+        label9 = self.mysmallfont.render("Food: "+str(self.resources[5])[:8], 1,
+                                                               (255, 255, 255))
+        label10 = self.mysmallfont.render("Total Energy: "+str(self.total_energy), 1,
+                                                                (255, 255, 255))
         
         screen.blit(label2, (rect[0] + marg, rect[1] + int(60*self.ratioh)))
         screen.blit(label3, (rect[0] + marg, rect[1] + int(80*self.ratioh)))
@@ -197,19 +279,27 @@ class Player():
         screen.blit(label9, (rect[0] + marg, rect[1] + int(200*self.ratioh)))
         screen.blit(label10, (rect[0] + marg, rect[1] + int(220*self.ratioh)))
        
-        pygame.draw.rect(screen, [255, 255, 255, 255], (int(50*self.ratiow), int(770*self.ratioh), int(180*self.ratiow), int(80*self.ratioh)), 3)
-        self.button1 = pygame.Rect(int(50*self.ratiow), int(770*self.ratioh), int(180*self.ratiow), int(80*self.ratioh))
+        pygame.draw.rect(screen, [255, 255, 255, 255], (int(50*self.ratiow),
+                                                                                         int(770*self.ratioh),
+                                        int(180*self.ratiow), int(80*self.ratioh)), 3)
+        self.button1 = pygame.Rect(int(50*self.ratiow), int(770*self.ratioh),
+                                                       int(180*self.ratiow), int(80*self.ratioh))
         label11 = self.myfont.render("Next Player", 1, (255, 255, 255))
         screen.blit(label11, (int(70*self.ratiow), int(790*self.ratioh)))
 
-        pygame.draw.rect(screen, [255, 255, 255, 255], (int(50*self.ratiow), int(880*self.ratioh), int(180*self.ratiow), int(80*self.ratioh)), 3)
-        self.button2 = pygame.Rect(int(50*self.ratiow), int(880*self.ratioh), int(180*self.ratiow), int(80*self.ratioh))
+        pygame.draw.rect(screen, [255, 255, 255, 255], (int(50*self.ratiow),
+                                      int(880*self.ratioh), int(180*self.ratiow), int(80*self.ratioh)), 3)
+        self.button2 = pygame.Rect(int(50*self.ratiow), int(880*self.ratioh),
+                                                       int(180*self.ratiow), int(80*self.ratioh))
         label12 = self.myfont.render("Save & quit", 1, (255, 255, 255))
         screen.blit(label12, (int(66*self.ratiow), int(902*self.ratioh)))
 
-        pygame.draw.rect(screen, [255, 255, 255, 255], (int(1490*self.ratiow), int(10*self.ratioh), int(150*self.ratiow), int(50*self.ratioh)), 3)
-        self.button3 = pygame.Rect(int(1490*self.ratiow), int(10*self.ratioh), int(150*self.ratiow), int(50*self.ratioh))
-        screen.fill([50, 50, 50], (int(1490*self.ratiow), int(10*self.ratioh), int(150*self.ratiow), int(50*self.ratioh)))
+        pygame.draw.rect(screen, [255, 255, 255, 255], (int(1490*self.ratiow),
+                                      int(10*self.ratioh), int(150*self.ratiow), int(50*self.ratioh)), 3)
+        self.button3 = pygame.Rect(int(1490*self.ratiow), int(10*self.ratioh),
+                                                       int(150*self.ratiow), int(50*self.ratioh))
+        screen.fill([50, 50, 50], (int(1490*self.ratiow), int(10*self.ratioh),
+                                                 int(150*self.ratiow), int(50*self.ratioh)))
 
         if pause: label13 = self.myfont.render("Play", 1, (255, 255, 255))
         if not pause: label13 = self.myfont.render("Pause", 1, (255, 255, 255))
