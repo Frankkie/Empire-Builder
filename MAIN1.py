@@ -1,3 +1,7 @@
+""" This module contains the MainScene class
+      that controls the main scene of the game
+      (the map scene). """
+
 import os
 import sys
 import random
@@ -14,15 +18,26 @@ import AREA
 
 
 class MainScene():
+    """ This class controls the main scene of the game
+          and the basic gameplay (turns, update of statistics,
+          map display, event handling). """
     def __init__(self, screen, NumPlayers, previous, clock, year):
-        self.NumPlayers = NumPlayers
+        """ (screen, NumPlayers, previous, clock, year)
+            Initializes variables, controls the initialization
+            of the game and the turns of the game. """
         self.screen = screen
+        self.NumPlayers = NumPlayers
+        
         metrics = GEN.screen_metrics()
         self.w = metrics[0]
         self.h = metrics[1]
         self.ratiow = metrics[2]
         self.ratioh = metrics[3]
-        screen.fill((0, 0, 0))  
+        
+        screen.fill((0, 0, 0))
+
+        # Controls whether this is a new game or the player
+        # is coming back from another scene (p.e. AreaScene)
         if previous == "MenuScene":
             self.InitializeGame()
             check = 1
@@ -33,6 +48,8 @@ class MainScene():
                 self.listofplayers = self.listofplayers + [i]
             year -= 1
             check = 0
+
+        # Controls the turns of players.
         while True:
             year += 1
             for player in self.listofplayers:
@@ -44,9 +61,14 @@ class MainScene():
                 if self.listofplayers.index(player) != len(self.listofplayers) - 1:
                     self.DrawMap(screen, player, year, self.Clock)
                 check = 1
+
         
     def InitializeGame(self):
+        """ This method initializes the variables
+            of the game. """
         self.AreaList = self.InitializeAreaList(self.screen, self.NumPlayers)
+
+        # Distributing the areas among the players.
         num = int(self.NumPlayers)
         if num == 1: cap = 60
         if num == 2: cap = 40
@@ -56,13 +78,19 @@ class MainScene():
             result = 0
             while not result:
                 result = self.DistributeAreas(num, i+1, cap)
+        
         self.TroopList = self.InitializeTroopList(self.screen)
         self.PlayerList = self.InitializePlayerList(self.screen, num)
         self.listofplayers = []
         for i in range(num + 1):
             self.listofplayers = self.listofplayers + [i]
 
+
     def InitializeAreaList(self, screen, players):
+        """ (screen, players), return self.AreaList
+            This method reads the InitAreas.txt and
+            creates the self.AreaList. """
+        
         f = open("InitAreas.txt", "r")
         self.AreaList = []
 
@@ -98,38 +126,41 @@ class MainScene():
             lista.append(line[8])
             lista.append(1000)
             lista.append(30)
-            
             lista.append([0, 0, 0, 0, 0, 0, 0, 0])
 
+            # Resources initialization.
             resources = list(lista[4])
-            
             for i in range(6):
                 resources[i] = int(resources[i])
-            
+            # Metal
             if resources[0] == 0: resources[0] = [1000, 1000, 10]
             else: resources[0] = [5000*resources[0], 5000*resources[0], 10]
-
+            # Timber
             if resources[1] == 0: resources[1] = [200, 200, 30]
             else: resources[1] = [200 + resources[1]*600, 200 + resources[1]*600, 30]
-
+            # Fossil fuels
             resources[2] = [1000 + resources[2]*1000, 1000 + resources[2]*1000, 5]
-
+            # Uranium
             if resources[3] == 0: resources[3] = [50, 50, 0]
             else: resources[3] = [250*resources[3], 250*resources[3], 0]
-
+            # Renewable energy
             resources[4] = [resources[4], 0]
-
-            if resources[5] < 7: resources[5] = [200 + 200*resources[5], 200 + 200*resources[5], 100]
-            else: resources[5] = [1700 + 300*(resources[5] - 7), 1700 + 300*(resources[5] - 7), 100]
-
+            # Food
+            if resources[5] < 7: resources[5] = [200 + 200*resources[5], 200 + 200*resources[5],
+                                                 100]
+            else: resources[5] = [1700 + 300*(resources[5] - 7), 1700 + 300*(resources[5] - 7),
+                                  100]
             lista[4] = resources
-            
+
             self.AreaList.append(lista)
 
         f.close()
         return self.AreaList
+
         
     def InitializeTroopList(self, screen):
+        """ (screen), returns self.TroopList
+            This method initializes the TroopList. """
         self.TroopList = []
         
         index = 0
@@ -147,7 +178,10 @@ class MainScene():
                 
         return self.TroopList
 
+
     def InitializePlayerList(self, screen, NumPlayers):
+        """ (screen, NumPlayers), returns PlayerList
+            This method initializes the PlayerList. """
         self.PlayerList = []
         for index in range(int(NumPlayers)):
             temp = [screen]
@@ -187,7 +221,14 @@ class MainScene():
 
         return self.PlayerList
 
+
     def DistributeAreas(self, players, player, cap):
+        """ (players, player, cap), returns an int for checking
+            This method distributes the areas among the players
+            so that their population is in the same range and
+            their areas are neighboring each other. """
+        # If players are 3 or less, each player may take more
+        # than 1 area.
         if players <= 3:
             total = 0
             index_dict = {}
@@ -213,8 +254,10 @@ class MainScene():
                         self.AreaList[index][5] = "p"+str(player)
                         total += self.AreaList[index][3]
                         
-                        if type(self.AreaList[index][7][-1]) == list: neighbors1 = self.AreaList[index][7][:-1]
-                        if type(self.AreaList[index][7][-1]) == int: neighbors1 = self.AreaList[index][7]
+                        if type(self.AreaList[index][7][-1]) == list:
+                            neighbors1 = self.AreaList[index][7][:-1]
+                        if type(self.AreaList[index][7][-1]) == int:
+                            neighbors1 = self.AreaList[index][7]
                         for index1 in neighbors1:
                             index_dict.update({str(index1):index1})
                         if total >= cap*0.8: return  1
@@ -235,6 +278,8 @@ class MainScene():
                     self.AreaList[self.AreaList.index(area)][5] = "c"
             return 0
 
+        # If there are more than 3 players (not including the
+        # computer, the players take only one area each. 
         if players > 3:
             total = 0
             index_dict = {}
@@ -248,8 +293,13 @@ class MainScene():
                     self.AreaList[index][5] = "p"+str(player)
                     return 1
 
+
     def WriteInfo(self):
+        """ This method writes the game info in the
+              Info.txt file. """
         f = open("Info.txt", "w")
+
+        # For the self.AreaList
         for area in self.AreaList:
             f.write("a,")
             f.write(area[1]+",")
@@ -297,6 +347,7 @@ class MainScene():
                     f.write(".")
                 i += 1
 
+        # For the self.TroopList
         for troop in self.TroopList:
             f.write("t,")
             f.write(str(troop[1])+",")
@@ -312,11 +363,11 @@ class MainScene():
                     f.write(str(units)+".")
             f.write(str(troop[6])+"\n")
 
+        # For the self.PlayerList
         for player in self.PlayerList:
             f.write("p,")
             f.write(str(player[1])+",")
             f.write(player[2]+",")
-            
             for area in player[3]:
                 if player[3].index(area) == len(player[3]) - 1:
                     f.write(str(area)+",")
@@ -340,14 +391,20 @@ class MainScene():
         
         f.close()
 
+
     def ReadInfo(self, screen):
+        """ Reads the info in the Info.txt file
+              and creates the Area, Troop and
+              Player lists. """
+        
         f = open("Info.txt", "r")
         self.AreaList = []
         self.TroopList = []
         self.PlayerList = []
+        
         for line in f:
             lista = []
-        
+            # Lines for the AreaList.
             if line[0] == "a":
                 lista = line.split(",")
                 lista[0] = screen
@@ -377,7 +434,8 @@ class MainScene():
                 for i in range(len(lista[11])):
                     lista[11][i] = int(lista[11][i])
                 self.AreaList.append(lista)
-            
+
+            # Lines for the TroopList
             if line[0] == "t":
                 lista = line.split(",")
                 lista[0] = screen
@@ -388,7 +446,8 @@ class MainScene():
                     lista[5][i] = int(lista[5][i])
                 lista[6] = float(lista[6])                
                 self.TroopList.append(lista)
-                
+
+            # Lines for the PlayerList
             if line[0] == "p":
                 lista = line.split(",")
                 lista[0] = screen
@@ -409,19 +468,26 @@ class MainScene():
         f.close()
 
         return
+
         
     def DrawMap(self, screen, player, year, clock):
-        
+        """ (screen, player, year, clock)
+            Draws the main scene on the screen,
+            handles events. """
         self.Clock = clock
         time = pygame.time.Clock()
+        
         self.player = player
-        if player == self.NumPlayers: playername = "c"
+        if player == self.NumPlayers:
+            playername = "c"
         else:
             playername = "p"+str(player + 1)
         
         self.pause = False
+        
         self.background = pygame.image.load("Colored Map, black sea.bmp")
-        self.background = pygame.transform.scale(self.background, (int(self.w/1.05), int(self.h/1.05)))
+        self.background = pygame.transform.scale(self.background, (int(self.w/1.05),
+                                                                   int(self.h/1.05)))
 
         self.verylargefont = pygame.font.SysFont("Times", int(50*self.ratiow))
         self.largefont = pygame.font.SysFont("Times", int(40*self.ratiow))
@@ -429,7 +495,8 @@ class MainScene():
         
         self.areadotlist = []
         self.troopdotlist = []
-        
+
+        # Creating the Area and Troop class objects.
         x = 0
         for i in range(len(self.AreaList)):
             self.areadotlist.append(OBJ.Area(self.AreaList[x]))
@@ -437,42 +504,50 @@ class MainScene():
 
         x = 0
         for i in range(len(self.TroopList)):
-            self.troopdotlist.append(OBJ.Troop(self.TroopList[x], self.AreaList[self.TroopList[x][4]][2]))
+            self.troopdotlist.append(OBJ.Troop(self.TroopList[x],
+                                               self.AreaList[self.TroopList[x][4]][2]))
             x += 1
 
         while 1:
+            # Clock ticking.
             dt = time.tick()
             if not self.pause:
                 self.Clock -= dt/1000
                 if self.Clock < 0:
                     return
-            
+
+            # Blitting map on screen.
             screen.blit(self.background, [0,0])
+
+            # Blitting troops and areas.
             for area in self.areadotlist:
                 area.draw_area(screen)
 
             for troop in self.troopdotlist:
                 troop.draw_troop(screen)
-
+            
             self.current_player = OBJ.Player(self.PlayerList[player], self.pause)
+            
             yearlabel = self.mediumfont.render("Year: "+str(year), 1, (255, 255, 255))
             screen.blit(yearlabel, [int(10*self.ratiow), int(10*self.ratioh)])
 
+            clock_ = str(int(self.Clock/60))+":"+str(int(self.Clock%60))
+            if self.Clock%60 < 10:
+                clock_ = str(int(self.Clock/60))+":0"+str(int(self.Clock%60))
+            clock_label = self.largefont.render(clock_, 1, (255, 255, 255))
+            screen.blit(clock_label, (int(1680*self.ratiow), int(10*self.ratioh)))
+
+            # Event handling.
             mouse_pos = pygame.mouse.get_pos()
-            
+
+            # Hover
             for i in range(len(self.AreaList)):
                 if self.areadotlist[i].button.collidepoint(mouse_pos):
                     self.areadotlist[i].hover_display(screen, self.areadotlist[i].rect)
-
             for i in range(len(self.TroopList)):
                 if self.troopdotlist[i].button.collidepoint(mouse_pos):
                     self.troopdotlist[i].hover_display(screen)
 
-            clock_ = str(int(self.Clock/60))+":"+str(int(self.Clock%60))
-            if self.Clock%60 < 10: clock_ = str(int(self.Clock/60))+":0"+str(int(self.Clock%60))
-            
-            clock_label = self.largefont.render(clock_, 1, (255, 255, 255))
-            screen.blit(clock_label, (int(1680*self.ratiow), int(10*self.ratioh)))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.display.quit()
@@ -488,7 +563,9 @@ class MainScene():
                                 self.WriteInfo()
                                 if self.AreaList[i][5] == playername: currentplayer = True
                                 else: currentplayer = False
-                                self.activescene = AREA.AreaScene(self.screen, self.AreaList[i], self.Clock, self.NumPlayers, year, currentplayer, self.player)
+                                self.activescene = AREA.AreaScene(self.screen, self.AreaList[i],
+                                                                  self.Clock, self.NumPlayers,
+                                                                  year, currentplayer, self.player)
                         for i in range(len(self.TroopList)):
                             if self.troopdotlist[i].button.collidepoint(mouse_pos):
                                     #Create Troop_display class
@@ -509,14 +586,22 @@ class MainScene():
             pygame.display.flip()
         return
 
-    def UpdateStatistics(self, player):
+
+    def UpdateStatistics(self, player): ############################## Change the update methods
+        # Make them in seperate file ###################################################################################
+        """ (player)
+            This method is called to update the
+            statistics of the game between turns. """
         total = 0
         old_food = self.PlayerList[player][4][5]
         food = self.UpdateFood(player)
         food_production = food - old_food
         for index in range(len(self.AreaList)):
             if self.AreaList[index][5] == self.PlayerList[player][2]:
-                self.AreaList[index][3] = self.UpdatePopulation(self.AreaList[index][3], self.AreaList[index][6], self.AreaList[index][8], self.AreaList[index][11])
+                self.AreaList[index][3] = self.UpdatePopulation(self.AreaList[index][3],
+                                                                self.AreaList[index][6],
+                                                                self.AreaList[index][8],
+                                                                self.AreaList[index][11])
                 total += self.AreaList[index][3]
         self.PlayerList[player][6] = total
         food_needs = int(total*10)
@@ -535,7 +620,8 @@ class MainScene():
         newtotal = 0
         #Make function CalculateDeaths(self)
         for index in self.PlayerList[player][3]:
-            self.AreaList[index][3] = round(self.AreaList[index][3] - portion*self.AreaList[index][3], 2)
+            self.AreaList[index][3] = round(self.AreaList[index][3]
+                                            - portion*self.AreaList[index][3], 2)
             newtotal += self.AreaList[index][3]
         self.PlayerList[player][6] = round(newtotal, 2)
         self.UpdateMetal(player)
@@ -545,6 +631,7 @@ class MainScene():
         self.UpdateIncome(player, food_remains)
         self.UpdateCoins(player)
         self.UpdateInfantry(player)
+
         
     def UpdatePopulation(self, old_pop, moral, basic_gdp, buildings):
         growth = old_pop*(moral - 50)/100*(1/16)
@@ -552,23 +639,31 @@ class MainScene():
         new_pop = old_pop + growth
         return round(new_pop, 2)
 
+
     def UpdateFood(self, player):
         food =  self.PlayerList[player][4][5]
         for index in (self.PlayerList[player][3]):
             buildings = self.AreaList[index][11]
-            temp = self.AreaList[index][4][5][0]*self.AreaList[index][4][5][2]*(1/500)*(math.sin(3.14/200*self.AreaList[index][6]) + 0.24)
+            temp = (self.AreaList[index][4][5][0]*self.AreaList[index][4][5][2]*(1/500)*
+                    (math.sin(3.14/200*self.AreaList[index][6]) + 0.24))
             bonus = temp*0.02*buildings[1] + temp*0.02*buildings[2] + temp*0.02*buildings[3]
             food += int(temp + bonus)
-            self.AreaList[index][4][5][0] = self.AreaList[index][4][5][0] - int(temp) + self.AreaList[index][4][5][1]/5
+            self.AreaList[index][4][5][0] = (self.AreaList[index][4][5][0] - int(temp)
+                                             + self.AreaList[index][4][5][1]/5)
         self.PlayerList[player][4][5] = food
         return food
+
 
     def UpdateMetal(self, player):
         metal = self.PlayerList[player][4][0]
         for index in (self.PlayerList[player][3]):
             buildings = self.AreaList[index][11]
-            if self.AreaList[index][4][0][0]*2 >= self.AreaList[index][4][0][1]: temp = (self.AreaList[index][6]/100)*self.AreaList[index][4][0][1]*self.AreaList[index][4][0][2]/1000
-            else: temp = (2/5)*((self.AreaList[index][4][0][0]**2)/self.AreaList[index][4][0][1])*(self.AreaList[index][6]/100)*(self.AreaList[index][4][0][2]/100)
+            if self.AreaList[index][4][0][0]*2 >= self.AreaList[index][4][0][1]:
+                temp = ((self.AreaList[index][6]/100)*self.AreaList[index][4][0][1]
+                        *self.AreaList[index][4][0][2]/1000)
+            else:
+                temp = ((2/5)*((self.AreaList[index][4][0][0]**2)/self.AreaList[index][4][0][1])
+                        *(self.AreaList[index][6]/100)*(self.AreaList[index][4][0][2]/100))
             self.AreaList[index][4][0][0] = self.AreaList[index][4][0][0] - int(temp)
             bonus = temp*0.02*buildings[1] + temp*0.02*buildings[2] + temp*0.02*buildings[3]
             if temp < 1:
@@ -577,22 +672,31 @@ class MainScene():
                 metal += int(temp + bonus)   
         self.PlayerList[player][4][0] = metal
 
+
     def UpdateTimber(self, player):
         timber = self.PlayerList[player][4][1]
         for index in (self.PlayerList[player][3]):
             buildings = self.AreaList[index][11]
-            temp = self.AreaList[index][4][1][0]*self.AreaList[index][4][1][2]*(1/500)*(math.sin(3.14/200*self.AreaList[index][6]) + 0.24)
+            temp = (self.AreaList[index][4][1][0]*self.AreaList[index][4][1][2]*(1/500)
+                    *(math.sin(3.14/200*self.AreaList[index][6]) + 0.24))
             bonus = temp*0.02*buildings[1] + temp*0.02*buildings[2] + temp*0.02*buildings[3]
             timber += int(temp + bonus)
-            self.AreaList[index][4][1][0] = self.AreaList[index][4][1][0] - int(temp) + self.AreaList[index][4][1][1]/5
+            self.AreaList[index][4][1][0] = (self.AreaList[index][4][1][0] - int(temp)
+                                             + self.AreaList[index][4][1][1]/5)
         self.PlayerList[player][4][1] = timber
+
 
     def UpdateFossilFuels(self, player, mine = 2):
         mined = self.PlayerList[player][4][mine]
         for index in (self.PlayerList[player][3]):
             buildings = self.AreaList[index][11]
-            if self.AreaList[index][4][mine][0]*2 >= self.AreaList[index][4][mine][1]: temp = (self.AreaList[index][6]/100)*self.AreaList[index][4][mine][1]*self.AreaList[index][4][mine][2]/1000
-            else: temp = (2/5)*((self.AreaList[index][4][mine][0]**2)/self.AreaList[index][4][mine][1])*(self.AreaList[index][6]/100)*(self.AreaList[index][4][mine][2]/100)
+            if self.AreaList[index][4][mine][0]*2 >= self.AreaList[index][4][mine][1]:
+                temp = ((self.AreaList[index][6]/100)*self.AreaList[index][4][mine][1]
+                        *self.AreaList[index][4][mine][2]/1000)
+            else:
+                temp = ((2/5)*((self.AreaList[index][4][mine][0]**2)
+                               /self.AreaList[index][4][mine][1])
+                        *(self.AreaList[index][6]/100)*(self.AreaList[index][4][mine][2]/100))
             bonus = temp*0.02*buildings[1] + temp*0.02*buildings[2] + temp*0.02*buildings[3]
             if temp + bonus < 1:
                 pass
@@ -601,13 +705,19 @@ class MainScene():
                 self.AreaList[index][4][mine][0] = self.AreaList[index][4][mine][0] - int(temp)
         self.PlayerList[player][4][mine] = mined
 
+
     def UpdateUranium(self, player, mine = 3):
         mined = self.PlayerList[player][4][mine]
         for index in (self.PlayerList[player][3]):
             if self.AreaList[index][11][1] >= 1 and self.AreaList[index][11][6] >= 1:
                 buildings = self.AreaList[index][11]
-                if self.AreaList[index][4][mine][0]*2 >= self.AreaList[index][4][mine][1]: temp = (self.AreaList[index][6]/100)*self.AreaList[index][4][mine][1]*self.AreaList[index][4][mine][2]/1000
-                else: temp = (2/5)*((self.AreaList[index][4][mine][0]**2)/self.AreaList[index][4][mine][1])*(self.AreaList[index][6]/100)*(self.AreaList[index][4][mine][2]/100)
+                if self.AreaList[index][4][mine][0]*2 >= self.AreaList[index][4][mine][1]:
+                    temp = ((self.AreaList[index][6]/100)*self.AreaList[index][4][mine][1]
+                            *self.AreaList[index][4][mine][2]/1000)
+                else:
+                    temp = ((2/5)*((self.AreaList[index][4][mine][0]**2)
+                                   /self.AreaList[index][4][mine][1])
+                            *(self.AreaList[index][6]/100)*(self.AreaList[index][4][mine][2]/100))
                 bonus = temp*0.02*buildings[1] + temp*0.02*buildings[2] + temp*0.02*buildings[3]
                 if temp + bonus < 1:
                     pass
@@ -616,15 +726,21 @@ class MainScene():
                     self.AreaList[index][4][mine][0] = self.AreaList[index][4][mine][0] - int(temp)
         self.PlayerList[player][4][mine] = mined
 
+
     def UpdateCoins(self, player):
         coins = self.PlayerList[player][5]
         for index in (self.PlayerList[player][3]):
-            coins += int(self.AreaList[index][10]/100*self.AreaList[index][9]*self.AreaList[index][3]*1000000)
+            coins += int(self.AreaList[index][10]/100*self.AreaList[index][9]
+                         *self.AreaList[index][3]*1000000)
         self.PlayerList[player][5] = coins
+
 
     def UpdateInfantry(self, player):
         for troop in (self.PlayerList[player][7]):
-            self.TroopList[troop][5][0] += int(math.log(self.AreaList[self.TroopList[troop][4]][3] + 3)*self.AreaList[self.TroopList[troop][4]][6]/100)
+            self.TroopList[troop][5][0] += int(math.log(self.AreaList[self.TroopList[troop][4]][3]
+                                                        + 3)
+                                               *self.AreaList[self.TroopList[troop][4]][6]/100)
+
 
     def UpdateIncome(self, player, food_remains):
         for area in (self.PlayerList[player][3]):
@@ -649,9 +765,11 @@ class MainScene():
             if income < 100: income = 100
             bonus = 0
             if buildings[0] == 1: bonus = 30
-            bonus += buildings[0]*30 + buildings[1]*5 + buildings[2]*7 + buildings[3]*5 + buildings[7]*5
+            bonus += (buildings[0]*30 + buildings[1]*5 + buildings[2]*7 + buildings[3]*5
+                      + buildings[7]*5)
             income += growth*bonus/100
             self.AreaList[area][9] = income
+
 
     def UpdateMoral(self, player, portion):
         for area in self.PlayerList[player][3]:
